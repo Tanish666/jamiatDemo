@@ -15,6 +15,13 @@
   --font-serif: var(--font-serif);
 }
 
+/* Global Container Override for 90% width */
+.max-w-7xl,
+.max-w-8xl,
+.max-w-6xl {
+  max-width: 90% !important;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;

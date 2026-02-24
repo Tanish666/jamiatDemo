@@ -143,7 +143,7 @@ const Impact = () => {
 
       {/* Stats Grid */}
       <section className="bg-white pb-24">
-        <div className="max-w-7xl mx-auto w-full -mt-24 relative z-20 px-4">
+        <div className="max-w-7xl mx-auto w-full -mt-16 lg:-mt-24 relative z-20 px-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {stats.map((stat, idx) => (
               <div
@@ -275,7 +275,7 @@ const Impact = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="max-w-7xl mx-auto px-4 py-20 lg:py-32">
+      {/* <section className="max-w-7xl mx-auto px-4 py-20 lg:py-32">
         <div className="bg-gradient-to-br from-[#064e3b] to-[#065f46] rounded-[48px] p-8 md:p-20 text-center relative overflow-hidden shadow-2xl shadow-emerald-900/20">
           <div className="absolute top-0 right-0 w-[50%] h-full bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.1),transparent_70%)]" />
           <div className="absolute bottom-0 left-0 w-[50%] h-full bg-[radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.05),transparent_70%)]" />
@@ -304,7 +304,7 @@ const Impact = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 };

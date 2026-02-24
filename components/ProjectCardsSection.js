@@ -40,22 +40,22 @@ const formatNumber = (num) => {
 
 // Skeleton Loader
 const ProjectCardSkeleton = () => (
-  <div className="overflow-hidden bg-white rounded-[2rem] shadow-sm animate-pulse flex flex-col h-[600px]">
-    <div className="h-64 bg-gray-200"></div>
-    <div className="p-8 space-y-4 flex-grow">
-      <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-      <div className="h-8 bg-gray-200 rounded w-3/4"></div>
-      <div className="h-4 bg-gray-200 rounded w-full"></div>
-      <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+  <div className="overflow-hidden bg-white rounded-[2rem] shadow-sm animate-pulse flex flex-col h-[480px]">
+    <div className="h-52 bg-gray-200"></div>
+    <div className="p-5 space-y-4 flex-grow">
+      <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+      <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+      <div className="h-3 bg-gray-200 rounded w-full"></div>
+      <div className="h-3 bg-gray-200 rounded w-5/6"></div>
       <div className="mt-auto space-y-4">
         <div className="flex justify-between">
-          <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-2 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-2 bg-gray-200 rounded w-1/4"></div>
         </div>
-        <div className="h-2 bg-gray-200 rounded-full w-full"></div>
-        <div className="flex gap-4">
-          <div className="h-14 bg-gray-200 rounded-2xl flex-grow"></div>
-          <div className="h-14 bg-gray-200 rounded-2xl w-14"></div>
+        <div className="h-1.5 bg-gray-200 rounded-full w-full"></div>
+        <div className="flex gap-2">
+          <div className="h-10 bg-gray-200 rounded-xl flex-grow"></div>
+          <div className="h-10 bg-gray-200 rounded-xl w-10"></div>
         </div>
       </div>
     </div>
@@ -68,13 +68,19 @@ export default function ProjectCardsSection({
   donationTypeFilter = "all",
   infiniteScroll = false, // homepage=false, projects page=true
   initialLimit = 4, // how many to load per API call
+  sortBy = "Most Urgent",
+  page: propPage,
+  onTotalPagesChange,
 }) {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
+  const [internalPage, setInternalPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const { isSignedIn } = useUser();
   const loaderRef = useRef(null);
+
+  // Use prop page if provided, else use internal state for infinite scroll
+  const page = propPage || internalPage;
 
   // Fetch data
   useEffect(() => {
@@ -84,9 +90,19 @@ export default function ProjectCardsSection({
       try {
         setLoading(true);
 
+        // Build query params
+        const queryParams = new URLSearchParams({
+          limit: initialLimit,
+          page: page,
+          search: searchTerm || "",
+          category: categoryFilter === "all" ? "" : categoryFilter,
+          donationType: donationTypeFilter === "all" ? "" : donationTypeFilter,
+          sortBy: sortBy,
+        });
+
         const [projectsRes, donationsRes] = await Promise.all([
           fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/projects?limit=${initialLimit}&page=${page}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/projects?${queryParams.toString()}`,
             { signal: controller.signal }
           ),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations/summary`, {
@@ -115,12 +131,19 @@ export default function ProjectCardsSection({
           }))
           : [];
 
-        // If page=1, reset list, else append
-        setProjects((prev) => (page === 1 ? merged : [...prev, ...merged]));
+        // If page=1 OR not infinite scroll, reset list, else append
+        setProjects((prev) => (page === 1 || !infiniteScroll ? merged : [...prev, ...merged]));
+
+        // Update total pages for parent
+        if (onTotalPagesChange) {
+          onTotalPagesChange(projectsData?.totalPages || 1);
+        }
 
         // Stop if no more pages
         if (page >= (projectsData?.totalPages || 1)) {
           setHasMore(false);
+        } else {
+          setHasMore(true);
         }
       } catch (err) {
         if (!(err instanceof DOMException && err.name === "AbortError")) {
@@ -133,16 +156,17 @@ export default function ProjectCardsSection({
 
     fetchData();
     return () => controller.abort();
-  }, [page, initialLimit]);
+    // Re-fetch when ANY filter or page changes
+  }, [page, initialLimit, searchTerm, categoryFilter, donationTypeFilter, sortBy, infiniteScroll, onTotalPagesChange]);
 
-  // Infinite scroll observer
+  // Infinite scroll observer (only used if no propPage and infiniteScroll is true)
   useEffect(() => {
-    if (!infiniteScroll || !loaderRef.current) return;
+    if (!infiniteScroll || !!propPage || !loaderRef.current) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !loading) {
-          setPage((prev) => prev + 1);
+          setInternalPage((prev) => prev + 1);
         }
       },
       { threshold: 1 }
@@ -150,7 +174,7 @@ export default function ProjectCardsSection({
 
     observer.observe(loaderRef.current);
     return () => observer.disconnect();
-  }, [infiniteScroll, hasMore, loading]);
+  }, [infiniteScroll, propPage, hasMore, loading]);
 
   // Filtering
   const filteredProjects = useMemo(() => {
@@ -167,8 +191,9 @@ export default function ProjectCardsSection({
 
       const matchesCategory =
         categoryFilter === "all" ||
-        (Array.isArray(project?.category) &&
-          project.category.includes(categoryFilter));
+        (Array.isArray(project?.category)
+          ? project.category.includes(categoryFilter)
+          : project?.category === categoryFilter);
 
       let matchesDonationType = true;
       if (donationTypeFilter !== "all") {
@@ -191,9 +216,9 @@ export default function ProjectCardsSection({
 
   return (
     <section className="flex flex-col items-center w-full py-4 text-gray-900">
-      {loading && page === 1 ? (
-        <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {Array.from({ length: 9 }).map(
+      {loading && (page === 1 || !infiniteScroll) ? (
+        <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+          {Array.from({ length: initialLimit || 9 }).map(
             (_, i) => (
               <ProjectCardSkeleton key={i} />
             )
@@ -202,7 +227,7 @@ export default function ProjectCardsSection({
       ) : (
         <>
           {/* Projects Grid */}
-          <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredProjects.map((project, index) => {
               // Determine category for icon/label
               const categoryMatch = project?.category?.[0] || "General Donation";
@@ -214,7 +239,7 @@ export default function ProjectCardsSection({
                   className="group overflow-hidden bg-white rounded-[2rem] shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col border border-gray-100"
                 >
                   {/* Image & Category Tag */}
-                  <div className="h-64 relative overflow-hidden">
+                  <div className="h-52 relative overflow-hidden">
                     <Image
                       src={project?.cardImage || project?.mainImage}
                       alt={project?.title || "Project"}
@@ -232,9 +257,9 @@ export default function ProjectCardsSection({
                   </div>
 
                   {/* Content */}
-                  <div className="p-7 pb-8 flex flex-col flex-grow">
+                  <div className="p-5 pb-6 flex flex-col flex-grow">
                     {/* Title */}
-                    <h3 className="text-[1.2rem] text-[#1e293b] font-bold mb-2 leading-tight line-clamp-2 min-h-[3rem]">
+                    <h3 className="text-[1.1rem] text-[#1e293b] font-bold mb-2 leading-tight line-clamp-2 min-h-[2.8rem]">
                       {project?.title || "Untitled Project"}
                     </h3>
 
@@ -271,6 +296,14 @@ export default function ProjectCardsSection({
 
                       {/* Action Buttons */}
                       <div className="flex gap-2">
+                        {project?.status !== "Completed" && (
+                          <Link
+                            href={`/donate/${project?.slug || ""}?type=${categoryMatch}`}
+                            className="flex-grow text-center bg-emerald-600 text-white py-2.5 px-4 rounded-lg hover:bg-emerald-700 font-bold transition-all duration-300 text-[0.85rem]"
+                          >
+                            Donate Now
+                          </Link>
+                        )}
                         <Link
                           href={`/projects/${project?.slug || ""}`}
                           className="flex-grow text-center border border-[#2ebc94] text-[#2ebc94] py-2.5 rounded-lg font-bold hover:bg-[#2ebc94] hover:text-white transition-all duration-300 text-[0.85rem]"
@@ -292,7 +325,7 @@ export default function ProjectCardsSection({
           {infiniteScroll && hasMore && (
             <div
               ref={loaderRef}
-              className="mt-10 grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              className="mt-10 grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
             >
               {Array.from({ length: 3 }).map((_, i) => (
                 <ProjectCardSkeleton key={`skeleton-${i}`} />

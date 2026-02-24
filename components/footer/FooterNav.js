@@ -93,9 +93,9 @@ export default function FooterNav() {
           <div className="flex flex-col gap-6">
             <Link href="/" className="flex items-center gap-3 group">
               <img
-                src="https://jamiat.org.in/static/fullpage/imgs/aim_vision/2wo.png"
+                src="logo.png"
                 alt="Jamiat Logo"
-                className="h-10 w-auto transition-transform group-hover:scale-105"
+                className="h-10 w-auto transition-transform group-hover:scale-105 filter brightness-0"
               />
               <span className={`${playfair.className} text-2xl font-bold text-slate-900 tracking-tight`}>
                 {footerData?.orgName || "Jamiat"}

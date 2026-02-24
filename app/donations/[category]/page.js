@@ -33,10 +33,10 @@ export default function DonatePage() {
       donationFrequency === "Daily"
         ? customAmount
         : donationFrequency === "Weekly"
-        ? customAmount / 7
-        : donationFrequency === "Monthly"
-        ? customAmount / 30
-        : customAmount / 365;
+          ? customAmount / 7
+          : donationFrequency === "Monthly"
+            ? customAmount / 30
+            : customAmount / 365;
     return {
       Daily: daily.toFixed(0),
       Monthly: (daily * 30).toFixed(0),
@@ -85,15 +85,15 @@ export default function DonatePage() {
   }, [minAmount]);
 
   // Razorpay Payment Handler
- const handlePayment = () => {
-  if (!isSignedIn) {
-    router.push("/login");
-    return;
-  }
-  if (!customAmount || customAmount < minAmount) {
-    alert(`Please enter a valid donation amount (minimum ₹${minAmount}).`);
-    return;
-  }
+  const handlePayment = () => {
+    if (!isSignedIn) {
+      router.push("/login");
+      return;
+    }
+    if (!customAmount || customAmount < minAmount) {
+      alert(`Please enter a valid donation amount (minimum ₹${minAmount}).`);
+      return;
+    }
 
     if (!donationType) {
       alert("Please select a donation type.");
@@ -304,11 +304,10 @@ export default function DonatePage() {
               {donationTypes.map((opt) => (
                 <label
                   key={opt.type}
-                  className={`flex flex-col p-4 rounded-xl border cursor-pointer ${
-                    donationType === opt.type
-                      ? "border-emerald-300 bg-emerald-50"
-                      : "border-gray-200 hover:border-emerald-200 hover:bg-emerald-50/50"
-                  }`}
+                  className={`flex flex-col p-4 rounded-xl border cursor-pointer ${donationType === opt.type
+                    ? "border-emerald-300 bg-emerald-50"
+                    : "border-gray-200 hover:border-emerald-200 hover:bg-emerald-50/50"
+                    }`}
                 >
                   <div className="flex items-center space-x-3">
                     <input
@@ -362,11 +361,10 @@ export default function DonatePage() {
               ].map((option) => (
                 <label
                   key={option.value}
-                  className={`flex items-center space-x-3 p-3 rounded-xl border cursor-pointer ${
-                    donationFor === option.value
-                      ? "border-emerald-300 bg-emerald-50"
-                      : "border-gray-200 hover:border-emerald-200 hover:bg-emerald-50/50"
-                  }`}
+                  className={`flex items-center space-x-3 p-3 rounded-xl border cursor-pointer ${donationFor === option.value
+                    ? "border-emerald-300 bg-emerald-50"
+                    : "border-gray-200 hover:border-emerald-200 hover:bg-emerald-50/50"
+                    }`}
                 >
                   <input
                     type="radio"
@@ -525,11 +523,10 @@ export default function DonatePage() {
                 <button
                   key={amount}
                   onClick={() => setCustomAmount(amount)}
-                  className={`py-2 px-4 rounded-lg border text-sm font-semibold hover:border-emerald-300 hover:bg-emerald-50 ${
-                    customAmount === amount
-                      ? "bg-emerald-100 border-emerald-400"
-                      : "border-gray-300"
-                  }`}
+                  className={`py-2 px-4 rounded-lg border text-sm font-semibold hover:border-emerald-300 hover:bg-emerald-50 ${customAmount === amount
+                    ? "bg-emerald-100 border-emerald-400"
+                    : "border-gray-300"
+                    }`}
                 >
                   ₹{amount.toLocaleString()}
                 </button>

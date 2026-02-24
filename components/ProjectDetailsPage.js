@@ -563,7 +563,7 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                         onChange={(e) => setAmount(e.target.value)}
                         min={minAmount}
                         placeholder={`Min: ₹${minAmount}`}
-                        className="w-full bg-gray-50 border border-gray-100 px-5 py-4 rounded-2xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-bold text-lg"
+                        className="w-full bg-gray-50 border border-gray-100 px-5 py-4 rounded-2xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-bold text-lg placeholder:text-gray-300 "
                       />
                       <div className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 font-bold">INR</div>
                     </div>

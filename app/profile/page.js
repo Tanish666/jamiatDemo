@@ -25,6 +25,10 @@ export default function ProfilePage() {
   const { user, isLoaded } = useUser();
   const [formData, setFormData] = useState(null);
   const [projects, setProjects] = useState([]);
+  const [donationSummary, setDonationSummary] = useState({
+    totalDonations: 0,
+    totalAmount: 0
+  });
   const [loadingDonor, setLoadingDonor] = useState(false);
   const [saving, setSaving] = useState(false);
   const [donorExists, setDonorExists] = useState(false);
@@ -98,19 +102,53 @@ export default function ProfilePage() {
 
           setFormData(merged);
 
-          if (merged.projectsDonatedTo?.length) {
-            const projectsRes = await fetch("/api/projects");
-            if (projectsRes.ok) {
-              const allProjects = await projectsRes.json();
-              const list = allProjects.projects || allProjects;
-              const donated = list.filter((p) =>
-                merged.projectsDonatedTo.includes(p._id)
-              );
+          // Fetch detailed donation data
+          try {
+            const donationsRes = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/donations/by-email?email=${encodeURIComponent(
+                email
+              )}`
+            );
+            if (donationsRes.ok) {
+              const donationData = await donationsRes.json();
+              const donated = (donationData.projects || []).map((p) => ({
+                _id: p.projectId,
+                title: p.projectTitle,
+                amount: p.amount,
+                donationsCount: p.donationsCount
+              }));
               setProjects(donated);
+
+              // Update total donated if available in the donation summary
+              if (donationData.totalDonated !== undefined) {
+                setFormData(prev => ({ ...prev, totalDonated: donationData.totalDonated }));
+              }
             }
+          } catch (donError) {
+            console.error("Error fetching donation details:", donError);
           }
         } else if (res.status === 404) {
           setDonorExists(false);
+        }
+
+        const donationsRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/donations/by-email?email=${encodeURIComponent(
+            email
+          )}`
+        );
+        if (donationsRes.ok) {
+          const donationData = await donationsRes.json();
+          const donatedProjects = (donationData.projects || []).map((p) => ({
+            _id: p.projectId,
+            title: p.projectTitle,
+            amount: p.amount,
+            donationsCount: p.donationsCount
+          }));
+          setProjects(donatedProjects);
+          setDonationSummary({
+            totalDonations: donationData.totalDonations || 0,
+            totalAmount: donationData.totalAmount || 0
+          });
         }
       } catch (err) {
         console.error("Error fetching donor:", err);
@@ -178,7 +216,12 @@ export default function ProfilePage() {
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
-
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0
+    }).format(amount || 0);
   return (
     <div className="min-h-screen bg-[#FDFDFC] pt-32 pb-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-12">
@@ -372,14 +415,20 @@ export default function ProfilePage() {
                   <h3 className="text-2xl font-serif font-bold">Your Donations</h3>
                 </div>
 
-                <div className="grid grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 gap-8">
                   <div className="space-y-1">
-                    <p className="text-4xl font-bold tracking-tight">{projects.length}</p>
-                    <p className="text-xs font-medium text-emerald-200 uppercase tracking-wider">PROJECTS</p>
+                    <p className="text-5xl font-bold tracking-tight">₹{formData.totalDonated?.toLocaleString() || 0}</p>
+                    <p className="text-xs font-medium text-emerald-200 uppercase tracking-wider">TOTAL DONATED</p>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-4xl font-bold tracking-tight">{donorExists ? "Live" : "New"}</p>
-                    <p className="text-xs font-medium text-emerald-200 uppercase tracking-wider">STATUS</p>
+                  <div className="grid grid-cols-2 gap-8 pt-6 border-t border-white/10">
+                    <div className="space-y-1">
+                      <p className="text-2xl font-bold tracking-tight">{projects.length}</p>
+                      <p className="text-xs font-medium text-emerald-200 uppercase tracking-wider">PROJECTS</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-2xl font-bold tracking-tight">{donorExists ? "Live" : "New"}</p>
+                      <p className="text-xs font-medium text-emerald-200 uppercase tracking-wider">STATUS</p>
+                    </div>
                   </div>
                 </div>
 
@@ -424,8 +473,12 @@ export default function ProfilePage() {
                             <Heart className="w-5 h-5" />
                           </div>
                           <div>
-                            <h4 className="font-bold text-gray-900 line-clamp-1 group-hover:text-emerald-700 transition-colors">{project.title}</h4>
-                            <p className="text-xs text-gray-400 font-medium">Contributed with sincerity</p>
+                            <h4 className="font-bold text-gray-900 line-clamp-1 group-hover:text-emerald-700 transition-colors">
+                              {project.title}
+                            </h4>
+                            <p className="text-xs text-gray-400 font-medium">
+                              ₹{project.amount?.toLocaleString() || 0} • {project.donationsCount || 0} donation{project.donationsCount !== 1 ? 's' : ''}
+                            </p>
                           </div>
                         </div>
                         <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-emerald-500 transition-transform group-hover:translate-x-1" />

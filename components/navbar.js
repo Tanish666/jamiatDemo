@@ -13,7 +13,7 @@ const playfair = Playfair_Display({
 
 export default function Headers() {
   const [isOpen, setIsOpen] = useState(false);
-  const { user } = useUser();
+  const { user, isSignedIn } = useUser();
   const pathname = usePathname();
   const navItems = [
     { href: "/", label: "Home" },
@@ -27,8 +27,8 @@ export default function Headers() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-      <div className="mx-4 mt-4">
-        <div className="max-w-7xl mx-auto backdrop-blur-md bg-[#00452E]/90 border border-emerald-800/50 shadow-lg shadow-emerald-950/20 rounded-2xl px-6 lg:px-8 py-3 flex items-center justify-between">
+      <div className="md:mx-4 md:mt-4">
+        <div className="w-full md:max-w-7xl mx-auto backdrop-blur-md bg-[#00452E]/90 border-b md:border border-emerald-800/50 shadow-lg shadow-emerald-950/20 md:rounded-2xl px-6 lg:px-8 py-3 flex items-center justify-between">
           {/* Left: Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center gap-3 group">
@@ -48,16 +48,31 @@ export default function Headers() {
               const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
 
               return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`relative text-sm font-semibold transition-colors group py-2 ${isActive ? "text-emerald-300" : "text-emerald-50 hover:text-emerald-300"
-                    }`}
-                >
-                  {item.label}
-                  <span className={`absolute bottom-0 left-0 h-0.5 bg-emerald-400 transition-transform duration-300 origin-left ${isActive ? "w-full scale-x-100" : "w-full scale-x-0 group-hover:scale-x-100"
-                    }`}></span>
-                </Link>
+                item.href === "/donate" ? (
+                  <Link
+                    key={item.href}
+                    href={isSignedIn ? "/donate" : "/login"}
+                    className={`relative text-sm font-semibold transition-colors group py-2 ${isActive ? "text-emerald-300" : "text-emerald-50 hover:text-emerald-300"
+                      }`}
+                  >
+                    {item.label}
+                    <span className={`absolute bottom-0 left-0 h-0.5 bg-emerald-400 transition-transform duration-300 origin-left ${isActive ? "w-full scale-x-100" : "w-full scale-x-0 group-hover:scale-x-100"
+                      }`}
+                    ></span>
+                  </Link>
+                ) : (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`relative text-sm font-semibold transition-colors group py-2 ${isActive ? "text-emerald-300" : "text-emerald-50 hover:text-emerald-300"
+                      }`}
+                  >
+                    {item.label}
+                    <span className={`absolute bottom-0 left-0 h-0.5 bg-emerald-400 transition-transform duration-300 origin-left ${isActive ? "w-full scale-x-100" : "w-full scale-x-0 group-hover:scale-x-100"
+                      }`}
+                    ></span>
+                  </Link>
+                )
               );
             })}
           </nav>
@@ -105,8 +120,8 @@ export default function Headers() {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="xl:hidden fixed inset-x-4 top-24 z-50">
-          <div className="bg-[#00452E] border border-emerald-800 rounded-2xl shadow-2xl p-6 space-y-6 animate-fade-in">
+        <div className="xl:hidden fixed inset-x-0 top-[64px] md:inset-x-4 md:top-24 z-50">
+          <div className="bg-[#00452E] border-t border-emerald-800 md:border md:rounded-2xl shadow-2xl p-6 space-y-6 animate-fade-in">
             <nav className="flex flex-col gap-4">
               {navItems.map((item) => {
                 const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));

@@ -66,6 +66,8 @@ export const metadata = {
   },
 };
 
+import ScrollToTop from "../components/ScrollToTop";
+
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
@@ -87,6 +89,7 @@ export default function RootLayout({ children }) {
         <body
           className={`${inter.className}`}
         >
+          <ScrollToTop />
           <Headers />
           {children}
           <FooterNav />

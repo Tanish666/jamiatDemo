@@ -40,9 +40,9 @@ export default function HomePageHeroSection({ hero }) {
         <section className="relative bg-white">
             <div className="relative">
                 {/* Top CTA */}
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 lg:pt-10 pb-12 lg:pb-24 flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 lg:pt-28 pb-12 lg:pb-24 flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-20">
                     {/* Left Content */}
-                    <div className="w-full lg:w-1/2 space-y-8">
+                    <div className="w-full lg:w-1/2 space-y-8 lg:pt-4 ">
                         {isLoading ? (
                             <div className="space-y-6">
                                 <SkeletonBox className="h-8 w-48 rounded-full" />
@@ -121,40 +121,50 @@ export default function HomePageHeroSection({ hero }) {
                     </div>
 
                     {/* Right Container */}
-                    <div className="w-full lg:w-[40%] relative">
+                    <div className="w-full lg:w-[40%] relative lg:mb-14">
                         {/* Decorative Background Elements */}
                         <div className="absolute -inset-10 bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none"></div>
 
                         {/* Main Container for Image */}
                         <div className="relative group">
                             <div className="absolute -inset-2  rounded-[2.5rem]  opacity-0 group-hover:opacity-100 transition duration-700"></div>
-                            <div className="relative aspect-square w-full  overflow-hidden  transition-all duration-500 ">
-                                {/* This is the div where the user can put their image */}
-                                <div id="hero-image-container" className="w-full flex items-center justify-center">
-                                    <div className="rounded-lg overflow-hidden">
-                                        <img
-                                            src="/heroPic.svg"
-                                            className="w-full object-cover "
-                                        />
-                                    </div>
-                                </div>
 
-                                {/* Overlay for that extra premium feel (optional, but looks good in image) */}
-                                <div className="absolute inset-0  via-transparent to-transparent pointer-events-none"></div>
-                            </div>
-
-                            {/* Floating Card Detail (Optional, like in the image) */}
-                            <div className="absolute -bottom-6 -left-6 bg-white p-5 rounded-2xl shadow-2xl shadow-emerald-950/10 border border-emerald-50/50 hidden sm:block animate-bounce-slow bg-gray-400">
-                                <div className="flex items-center gap-3">
-                                    <div className="size-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                                        <Heart className="size-5 text-emerald-600 fill-emerald-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Recent Donation</p>
-                                        <p className="text-sm font-bold text-slate-900">₹5,000 for Water Project</p>
-                                    </div>
+                            {isLoading ? (
+                                <div className="relative aspect-square w-full rounded-[2.5rem] overflow-hidden">
+                                    <SkeletonBox className="w-full h-full" />
                                 </div>
-                            </div>
+                            ) : (
+                                <>
+                                    <div className="relative aspect-square w-full  overflow-hidden  transition-all duration-500 ">
+                                        {/* This is the div where the user can put their image */}
+                                        <div id="hero-image-container" className="w-full h-full flex items-center justify-center">
+                                            <div className="w-full h-full rounded-2xl overflow-hidden">
+                                                <img
+                                                    src="/donate.jpg"
+                                                    alt="Hero"
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Overlay for that extra premium feel (optional, but looks good in image) */}
+                                        <div className="absolute inset-0  via-transparent to-transparent pointer-events-none"></div>
+                                    </div>
+
+                                    {/* Floating Card Detail (Optional, like in the image) */}
+                                    <div className="absolute -bottom-6 -left-6 bg-white p-5 rounded-2xl shadow-2xl shadow-emerald-950/10 border-2 border-emerald-50/50 hidden sm:block animate-bounce-slow bg-gray-600">
+                                        <div className="flex items-center gap-3">
+                                            <div className="size-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                                                <Heart className="size-5 text-emerald-600 fill-emerald-600" />
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Recent Donation</p>
+                                                <p className="text-sm font-bold text-slate-900">₹5,000 for Water Project</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

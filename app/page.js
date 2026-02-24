@@ -315,11 +315,12 @@ export default function Home() {
     const lenis = new Lenis({
       duration: 3
     });
+    let rafId;
     function raf(time) {
       lenis.raf(time)
-      requestAnimationFrame(raf)
+      rafId = requestAnimationFrame(raf)
     }
-    requestAnimationFrame(raf);
+    rafId = requestAnimationFrame(raf);
 
     async function fetchHero() {
       const data = await getHeroData();
@@ -327,6 +328,11 @@ export default function Home() {
     }
 
     fetchHero();
+
+    return () => {
+      lenis.destroy();
+      cancelAnimationFrame(rafId);
+    };
   }, []);
 
 
@@ -397,19 +403,19 @@ export default function Home() {
         </div>
 
         {/* Inspirational Quote Section */}
-        <section className="relative py-24 lg:py-40 overflow-hidden bg-white">
+        <section className="relative py-24 lg:py-18 overflow-hidden bg-white">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-50/30 to-transparent"></div>
 
           <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             {/* Decorative Quote Icon */}
-            <div className="mb-12 flex justify-center">
+            <div className="mb-0 flex justify-center">
               <div className="size-16 rounded-2xl bg-amber-100 flex items-center justify-center rotate-3 shadow-sm">
-                <span className="text-4xl text-amber-600 font-serif mb-2 leading-none">"</span>
+                <span className="text-5xl text-amber-600 font-serif mb-2 leading-none">"</span>
               </div>
             </div>
 
             <div className="space-y-10">
-              <h3 className="font-serif italic text-3xl lg:text-5xl text-slate-800 leading-tight lg:leading-[1.5] tracking-tight max-w-3xl mx-auto">
+              <h3 className="font-serif italic text-4xl lg:text-5xl text-slate-800 leading-tight lg:leading-[1.5] tracking-tight max-w-3xl mx-auto">
                 {quote?.text ||
                   "Whoever saves one life - it is as if he had saved mankind entirely."}
               </h3>
@@ -429,48 +435,16 @@ export default function Home() {
           <MobileDonationCategories />
         </div>
 
-        {/* Daily Giving Section */}
-        <div className="mx-4 sm:mx-6 lg:mx-8 mb-8 relative overflow-hidden bg-[#06422d] rounded-[2rem] lg:rounded-[4rem] py-20 lg:py-32 px-6">
-          {/* Subtle Glow */}
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-emerald-500/5 blur-[120px] rounded-full translate-x-1/2"></div>
 
-          <div className="relative max-w-4xl mx-auto text-center space-y-8">
-            <div className="space-y-4">
-              <h2 className={`${playfair.className} text-3xl lg:text-5xl font-bold text-white tracking-tight leading-tight`}>
-                Start Your Daily Giving Journey
-              </h2>
-
-              <p className="text-white/80 text-base lg:text-lg max-w-2xl mx-auto leading-relaxed">
-                Commit to a daily amount and make a lasting impact. Every rupee counts!
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/projects/general-sadqa-fund"
-                className="w-full sm:w-auto px-10 py-4 bg-white text-[#06422d] hover:bg-emerald-50 text-lg font-bold rounded-2xl transition-all duration-300 active:scale-[0.98] flex items-center justify-center"
-              >
-                Begin with ₹1/Day
-              </Link>
-
-              <Link
-                href="/projects"
-                className="w-full sm:w-auto px-10 py-4 bg-transparent border border-white text-white hover:bg-white/10 text-lg font-bold rounded-2xl transition-all duration-300 flex items-center justify-center"
-              >
-                Learn More
-              </Link>
-            </div>
-          </div>
-        </div>
 
         {/* Ready to Make a Difference CTA */}
-        <section className="mx-4 sm:mx-6 lg:mx-8 mb-8 py-20 lg:py-32 px-6 relative overflow-hidden bg-[#06422d] rounded-[2rem] lg:rounded-[4rem]">
+        <section className="mx-4 sm:mx-6 lg:mx-8 mb-8 py-16 lg:py-22 px-6 relative overflow-hidden bg-[#06422d] rounded-[2rem] lg:rounded-[4rem]">
           {/* Subtle Glow */}
           <div className="absolute top-0 right-0 w-1/2 h-full bg-emerald-500/5 blur-[120px] rounded-full translate-x-1/2"></div>
 
           <div className="relative max-w-4xl mx-auto text-center space-y-10">
             <div className="space-y-6">
-              <h2 className={`${playfair.className} text-4xl lg:text-6xl font-bold text-white font-serif tracking-tight leading-tight`}>
+              <h2 className={`${playfair.className} text-5xl lg:text-6xl font-bold text-white font-serif tracking-tight leading-tight`}>
                 Ready to Make a Difference?
               </h2>
 
