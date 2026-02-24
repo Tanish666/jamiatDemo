@@ -172,7 +172,7 @@ export const VolunteerPage = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">Area of Interest</label>
+                  <label className="text-sm font-semibold text-gray-700">Skills & Expertise</label>
                   <div className="relative">
                     <select
                       name="interest"
@@ -201,26 +201,6 @@ export const VolunteerPage = () => {
                     required
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none resize-none placeholder:text-gray-500"
                   />
-                </div>                <div className="p-4 bg-gray-50 rounded-2xl flex items-start gap-4">
-                  <div
-                    onClick={() => setFormData(prev => ({ ...prev, newsletter: !prev.newsletter }))}
-                    className="flex items-center h-5 mt-1 cursor-pointer"
-                  >
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.newsletter ? 'border-[#10B981] bg-[#10B981]' : 'border-gray-300 bg-white'}`}>
-                      {formData.newsletter && (
-                        <div className="w-2.5 h-2.5 rounded-full bg-white" />
-                      )}
-                    </div>
-                  </div>
-                  <div className="space-y-0.5">
-                    <label
-                      onClick={() => setFormData(prev => ({ ...prev, newsletter: !prev.newsletter }))}
-                      className="text-sm font-bold text-gray-900 cursor-pointer block"
-                    >
-                      Keep me updated on future opportunities
-                    </label>
-                    <p className="text-sm text-gray-500">Receive occasional emails about new volunteer events.</p>
-                  </div>
                 </div>
                 <button
                   type="submit"
