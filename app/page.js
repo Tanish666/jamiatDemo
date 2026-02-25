@@ -438,7 +438,7 @@ export default function Home() {
 
 
         {/* Ready to Make a Difference CTA */}
-        <section className="mx-4 sm:mx-6 lg:mx-8 mb-8 py-16 lg:py-22 px-6 relative overflow-hidden bg-[#06422d] rounded-[2rem] lg:rounded-[4rem]">
+        <section className="mx-4 sm:mx-6 lg:mx-10 mb-8 py-16 lg:py-22 px-6 relative overflow-hidden bg-[#06422d] rounded-[2rem] lg:rounded-[4rem] mt-8">
           {/* Subtle Glow */}
           <div className="absolute top-0 right-0 w-1/2 h-full bg-emerald-500/5 blur-[120px] rounded-full translate-x-1/2"></div>
 

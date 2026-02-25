@@ -37,7 +37,7 @@ function Projects({ title }) {
           { signal: controller.signal }
         );
         const data = await res.json();
-
+        console.log(data);
         const cats = Array.isArray(data)
           ? data
           : Array.isArray(data.categories)

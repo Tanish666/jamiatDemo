@@ -78,7 +78,7 @@ const TruncatedDescription = ({ html, slug }) => {
     <div className="mt-3 relative">
       <div
         ref={descriptionRef}
-        className="text-[13px] sm:text-sm text-gray-500 line-clamp-3 leading-relaxed min-h-[60px]"
+        className="text-[13px] sm:text-xs text-gray-500 line-clamp-3 leading-relaxed min-h-[60px]"
         dangerouslySetInnerHTML={{
           __html: html || "No description available",
         }}
