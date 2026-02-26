@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import ProjectCardsSection from "./ProjectCardsSection";
-import { Filter, Search } from "lucide-react";
+import { Filter, Search, ChevronDown, Check } from "lucide-react";
 import useResponsiveLimit from "../app/hooks/useResponsiveLimit";
 import useDebounce from "../app/hooks/useDebounce";
 import { Playfair_Display } from "next/font/google";
@@ -11,6 +11,87 @@ const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800", "900"],
 });
+
+// Custom Dropdown Component
+const Dropdown = ({ value, onChange, options, icon: Icon, labelKey, valueKey, labelMapping }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const getLabel = (option) => {
+    if (labelMapping) return labelMapping(option);
+    return labelKey ? option[labelKey] : option;
+  };
+
+  const getValue = (option) => {
+    return valueKey ? option[valueKey] : option;
+  };
+
+  const selectedLabel = useMemo(() => {
+    const selectedOption = options.find(opt => getValue(opt) === value);
+    return selectedOption ? getLabel(selectedOption) : value;
+  }, [value, options, labelKey, valueKey, labelMapping]);
+
+  return (
+    <div className={`relative flex-1 lg:w-56 ${isOpen ? 'z-[60]' : 'z-10'}`} ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`w-full flex items-center gap-3 px-4 py-3.5 text-sm font-medium transition-all rounded-2xl border-none outline-none cursor-pointer
+          ${isOpen ? 'bg-white ring-4 ring-emerald-500/10 shadow-sm' : 'bg-slate-50 hover:bg-slate-100'}
+        `}
+      >
+        <div className={`p-1.5 rounded-lg transition-colors ${isOpen ? 'bg-emerald-50 text-emerald-600' : 'text-slate-400'}`}>
+          <Icon className="h-4 w-4" />
+        </div>
+        <span className="flex-1 text-left truncate text-slate-700">
+          {selectedLabel}
+        </span>
+        <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180 text-emerald-500' : ''}`} />
+      </button>
+
+      {/* Dropdown Menu */}
+      {isOpen && (
+        <div className="absolute top-full left-0 right-0 mt-2 z-[100] py-2 bg-white backdrop-blur-xl border border-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="max-h-64 overflow-y-auto scrollbar-hide">
+            {options.map((option, idx) => {
+              const optValue = getValue(option);
+              const optLabel = getLabel(option);
+              const isSelected = value === optValue;
+
+              return (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    onChange(optValue);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors text-left
+                    ${isSelected
+                      ? 'bg-emerald-50 text-emerald-700 font-semibold'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}
+                  `}
+                >
+                  <span className="truncate">{optLabel}</span>
+                  {isSelected && <Check className="h-4 w-4 text-emerald-600 shrink-0 ml-2" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 
 function Projects({ title }) {
   const [searchInput, setSearchInput] = useState("");
@@ -88,7 +169,7 @@ function Projects({ title }) {
       </section>
 
       {/* Filter Section */}
-      <section className="top-4 z-30 px-3 sm:px-10 mb-12">
+      <section className="relative z-[50] px-3 sm:px-10 mb-12">
         <div className="bg-white/80 backdrop-blur-xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl p-2 sm:p-3 max-w-7xl mx-auto">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
             {/* Search Container */}
@@ -117,56 +198,32 @@ function Projects({ title }) {
               className={`${showFilters ? "flex" : "hidden"
                 } lg:flex flex-col sm:flex-row gap-3 w-full lg:w-auto animate-in fade-in slide-in-from-top-2 duration-300`}
             >
-              {/* Category Dropdown */}
-              <div className="relative group flex-1 lg:w-56">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                  <Filter className="h-4 w-4 text-slate-400" />
-                </div>
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="w-full pl-11 pr-10 py-3.5 text-sm font-medium bg-slate-50 border-transparent rounded-2xl appearance-none cursor-pointer focus:bg-white focus:border-emerald-200 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
-                >
-                  <option value="all">All Categories</option>
-                  {categories.map((cat) => (
-                    <option key={cat._id} value={cat.name}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
-                </div>
-              </div>
+              <Dropdown
+                value={categoryFilter}
+                onChange={setCategoryFilter}
+                options={[{ _id: 'all', name: 'All Categories' }, ...categories]}
+                icon={Filter}
+                labelKey="name"
+                valueKey="name"
+              />
 
-              {/* Donation Type Dropdown */}
-              <div className="relative group flex-1 lg:w-56">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-emerald-500/70">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                </div>
-                <select
-                  value={donationTypeFilter}
-                  onChange={(e) => setDonationTypeFilter(e.target.value)}
-                  className="w-full pl-11 pr-10 py-3.5 text-sm font-medium bg-slate-50 border-transparent rounded-2xl appearance-none cursor-pointer focus:bg-white focus:border-emerald-200 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
-                >
-                  {donationTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type === "all"
-                        ? "All Donation Types"
-                        : type === "zakat"
-                          ? "Zakat Eligible"
-                          : type === "interest_earnings"
-                            ? "Interest Earnings"
-                            : type === "sadqa"
-                              ? "Sadqa"
-                              : "General"}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
-                </div>
-              </div>
+              <Dropdown
+                value={donationTypeFilter}
+                onChange={setDonationTypeFilter}
+                options={donationTypes}
+                icon={({ className }) => (
+                  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                )}
+                labelMapping={(val) => {
+                  if (val === "all") return "All Donation Types";
+                  if (val === "zakat") return "Zakat Eligible";
+                  if (val === "interest_earnings") return "Interest Earnings";
+                  if (val === "sadqa") return "Sadqa";
+                  return val.charAt(0).toUpperCase() + val.slice(1);
+                }}
+              />
 
               {/* Clear Button */}
               <button
