@@ -128,7 +128,7 @@ export default async function BlogDetail({ params }) {
         {renderYoutube()}
 
         <div
-          className="prose max-w-none mx-auto"
+          className="prose max-w-none mx-auto break-words overflow-hidden w-full"
           dangerouslySetInnerHTML={{ __html: blog.content }}
         />
       </div>

@@ -26,7 +26,7 @@ export default function Headers() {
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+    <header className="fixed top-0 left-0 right-0 z-[999] transition-all duration-300">
       <div className="md:mx-4 md:mt-4">
         <div className="w-full md:max-w-7xl mx-auto backdrop-blur-md bg-[#00452E]/90 border-b md:border border-emerald-800/50 shadow-lg shadow-emerald-950/20 md:rounded-2xl px-6 lg:px-8 py-3 flex items-center justify-between">
           {/* Left: Logo */}
@@ -43,7 +43,7 @@ export default function Headers() {
           </div>
 
           {/* Desktop Nav */}
-          <nav className="hidden xl:flex items-center gap-8">
+          <nav className="hidden xl:flex items-center gap-8 z-50">
             {navItems.map((item) => {
               const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
 

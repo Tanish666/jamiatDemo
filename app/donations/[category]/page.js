@@ -30,15 +30,12 @@ export default function DonatePage() {
   const quickAmounts = [1000, 2500, 5000, 10000, 15000, 25000];
   const impact = (() => {
     const daily =
-      donationFrequency === "Daily"
-        ? customAmount
-        : donationFrequency === "Weekly"
-          ? customAmount / 7
-          : donationFrequency === "Monthly"
-            ? customAmount / 30
-            : customAmount / 365;
+      donationFrequency === "Weekly"
+        ? customAmount / 7
+        : donationFrequency === "Monthly"
+          ? customAmount / 30
+          : customAmount / 365;
     return {
-      Daily: daily.toFixed(0),
       Monthly: (daily * 30).toFixed(0),
       Yearly: (daily * 365).toFixed(0),
     };
@@ -48,7 +45,6 @@ export default function DonatePage() {
   const [message, setMessage] = useState("");
   const minAmounts = {
     "One-Time": 50,
-    Daily: 5,
     Weekly: 20,
     Monthly: 50,
     Yearly: 365,
@@ -450,7 +446,7 @@ export default function DonatePage() {
                   Select frequency:
                 </label>
                 <div className="space-y-2">
-                  {["Daily", "Weekly", "Monthly", "Yearly"].map((freq) => (
+                  {["Weekly", "Monthly", "Yearly"].map((freq) => (
                     <label key={freq} className="flex items-center space-x-3">
                       <input
                         type="radio"
@@ -552,10 +548,6 @@ export default function DonatePage() {
                 Your Contribution Impact
               </h3>
               <div className="grid grid-cols-3 gap-4 text-sm text-gray-700">
-                <div className="text-center">
-                  <div className="font-bold text-lg">₹{impact.Daily}</div>
-                  <div>Daily</div>
-                </div>
                 <div className="text-center">
                   <div className="font-bold text-lg">₹{impact.Monthly}</div>
                   <div>Monthly</div>

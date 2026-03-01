@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import useSWR from "swr";
 import {
@@ -19,6 +19,7 @@ import {
   Clock,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -35,13 +36,24 @@ const fetcher = (url) => fetch(url).then((res) => res.json());
 
 export default function ProjectDetailsPage({ slug, projectId }) {
   const { isSignedIn } = useUser();
-  const [activeTab, setActiveTab] = useState("impact");
+  const [activeTab, setActiveTab] = useState("about");
   const [checkedDonationType, setCheckedDonationType] = useState();
   const [amount, setAmount] = useState("");
   const [frequency, setFrequency] = useState("One-Time");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   const minAmounts = {
     "One-Time": 50,
-    Daily: 5,
     Weekly: 20,
     Monthly: 50,
     Yearly: 365,
@@ -262,17 +274,6 @@ export default function ProjectDetailsPage({ slug, projectId }) {
               >
                 {/* Custom Tab Switcher */}
                 <div className="flex bg-gray-100/50 p-1.5 rounded-2xl w-fit">
-                  {project?.impact?.length > 0 && (
-                    <button
-                      className={`px-6 py-2.5 text-sm font-bold rounded-xl transition-all ${activeTab === "impact"
-                        ? "bg-white text-emerald-600 shadow-sm"
-                        : "text-gray-500 hover:text-gray-900"
-                        }`}
-                      onClick={() => setActiveTab("impact")}
-                    >
-                      Impact
-                    </button>
-                  )}
                   {project?.description && (
                     <button
                       className={`px-6 py-2.5 text-sm font-bold rounded-xl transition-all ${activeTab === "about"
@@ -282,6 +283,17 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                       onClick={() => setActiveTab("about")}
                     >
                       About
+                    </button>
+                  )}
+                  {project?.impact?.length > 0 && (
+                    <button
+                      className={`px-6 py-2.5 text-sm font-bold rounded-xl transition-all ${activeTab === "impact"
+                        ? "bg-white text-emerald-600 shadow-sm"
+                        : "text-gray-500 hover:text-gray-900"
+                        }`}
+                      onClick={() => setActiveTab("impact")}
+                    >
+                      Impact
                     </button>
                   )}
                   {project?.updates?.length > 0 && (
@@ -300,52 +312,6 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                 {/* Tab Content */}
                 <div className="min-h-[300px]">
                   <AnimatePresence mode="wait">
-                    {activeTab === "impact" && (
-                      <motion.div
-                        key="impact"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 10 }}
-                        className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                      >
-                        {project?.impact
-                          .slice()
-                          .sort((a, b) => {
-                            const order = { Direct: 1, Indirect: 2, "Long-term": 3 };
-                            return (order[a.type] || 99) - (order[b.type] || 99);
-                          })
-                          .map((impact, idx) => {
-                            let Icon = ImpactIcon;
-                            if (impact.type === "Indirect") Icon = Layers;
-                            if (impact.type === "Long-term") Icon = Calendar;
-
-                            return (
-                              <div
-                                key={idx}
-                                className="p-8 rounded-[2rem] bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-4"
-                              >
-                                <div className="flex items-center gap-4">
-                                  <div className="p-3.5 rounded-2xl bg-emerald-50 text-emerald-600">
-                                    <Icon className="w-6 h-6" />
-                                  </div>
-                                  <div>
-                                    <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight">
-                                      {impact.type || "Impact"}
-                                    </h3>
-                                    <p className="text-xs font-bold text-emerald-600/60 uppercase tracking-widest">
-                                      {impact.title || "Project Impact"}
-                                    </p>
-                                  </div>
-                                </div>
-                                <p className="text-gray-600 text-sm leading-relaxed">
-                                  {impact.description}
-                                </p>
-                              </div>
-                            );
-                          })}
-                      </motion.div>
-                    )}
-
                     {activeTab === "about" && (
                       <motion.div
                         key="about"
@@ -402,6 +368,52 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                             </div>
                           </div>
                         )}
+                      </motion.div>
+                    )}
+
+                    {activeTab === "impact" && (
+                      <motion.div
+                        key="impact"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 10 }}
+                        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                      >
+                        {project?.impact
+                          .slice()
+                          .sort((a, b) => {
+                            const order = { Direct: 1, Indirect: 2, "Long-term": 3 };
+                            return (order[a.type] || 99) - (order[b.type] || 99);
+                          })
+                          .map((impact, idx) => {
+                            let Icon = ImpactIcon;
+                            if (impact.type === "Indirect") Icon = Layers;
+                            if (impact.type === "Long-term") Icon = Calendar;
+
+                            return (
+                              <div
+                                key={idx}
+                                className="p-8 rounded-[2rem] bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-4"
+                              >
+                                <div className="flex items-center gap-4">
+                                  <div className="p-3.5 rounded-2xl bg-emerald-50 text-emerald-600">
+                                    <Icon className="w-6 h-6" />
+                                  </div>
+                                  <div>
+                                    <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight">
+                                      {impact.type || "Impact"}
+                                    </h3>
+                                    <p className="text-xs font-bold text-emerald-600/60 uppercase tracking-widest">
+                                      {impact.title || "Project Impact"}
+                                    </p>
+                                  </div>
+                                </div>
+                                <p className="text-gray-600 text-sm leading-relaxed">
+                                  {impact.description}
+                                </p>
+                              </div>
+                            );
+                          })}
                       </motion.div>
                     )}
 
@@ -516,7 +528,7 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden"
+                className="bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] "
               >
                 <div className="px-8 py-6 border-b border-gray-50 flex items-center gap-3">
                   <div className="bg-emerald-50 p-2.5 rounded-xl">
@@ -563,26 +575,53 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                         onChange={(e) => setAmount(e.target.value)}
                         min={minAmount}
                         placeholder={`Min: ₹${minAmount}`}
-                        className="w-full bg-gray-50 border border-gray-100 px-5 py-4 rounded-2xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-bold text-lg placeholder:text-gray-300 "
+                        className="w-full bg-gray-50 border border-gray-100 px-5 py-4 rounded-2xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-bold text-lg placeholder:text-gray-300 text-gray-600"
                       />
                       <div className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 font-bold">INR</div>
                     </div>
                   </div>
 
                   {/* Frequency Selection */}
-                  <div className="space-y-4">
+                  <div className="space-y-2">
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Giving Frequency</label>
-                    <div className="flex bg-gray-50 p-1.5 rounded-2xl">
-                      {["One-Time", "Monthly"].map((f) => (
-                        <button
-                          key={f}
-                          onClick={() => setFrequency(f)}
-                          className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${frequency === f ? "bg-white text-emerald-600 shadow-sm" : "text-gray-400"
-                            }`}
-                        >
-                          {f}
-                        </button>
-                      ))}
+                    <div className="relative " ref={dropdownRef}>
+                      <button
+                        type="button"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className={`w-full bg-gray-50 border border-gray-100 px-5 py-4 rounded-2xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-bold text-base flex items-center justify-between text-gray-600 hover:bg-gray-100/50 ${isDropdownOpen ? 'ring-2 ring-emerald-500/20 border-emerald-500' : ''}`}
+                      >
+                        <span>{frequency}</span>
+                        <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180 text-emerald-500' : ''}`} />
+                      </button>
+
+                      <AnimatePresence>
+                        {isDropdownOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                            className="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl shadow-gray-200/40 overflow-hidden py-1"
+                          >
+                            {["One-Time", "Weekly", "Monthly", "Yearly"].map((f) => (
+                              <button
+                                key={f}
+                                type="button"
+                                onClick={() => {
+                                  setFrequency(f);
+                                  setIsDropdownOpen(false);
+                                }}
+                                className={`w-full px-5 py-3 text-left transition-colors font-bold text-sm ${frequency === f
+                                  ? "bg-emerald-50 text-emerald-600"
+                                  : "text-gray-600 hover:bg-gray-50 hover:text-emerald-500/80"
+                                  }`}
+                              >
+                                {f}
+                              </button>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   </div>
 

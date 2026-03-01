@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   TrendingUp,
   ArrowRight,
+  ChevronDown,
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
@@ -23,13 +24,25 @@ export default function DonatePage({ searchParams }) {
 
   const [isRazorpayReady, setIsRazorpayReady] = useState(false);
 
-  const initialFrequency = frequency ?? "One-Time";
+  const validFrequencies = ["One-Time", "Weekly", "Monthly", "Yearly"];
+  const initialFrequency = validFrequencies.includes(frequency) ? frequency : "One-Time";
   const [donationFrequency, setDonationFrequency] =
     useState(initialFrequency);
   const [isRecurring, setIsRecurring] = useState(
     initialFrequency !== "One-Time"
   );
-  const [requestCertificate, setRequestCertificate] = useState(false);
+  const [isFrequencyOpen, setIsFrequencyOpen] = useState(false);
+  const frequencyRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (frequencyRef.current && !frequencyRef.current.contains(event.target)) {
+        setIsFrequencyOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(projectId);
   const [customAmount, setCustomAmount] = useState(
@@ -56,12 +69,7 @@ export default function DonatePage({ searchParams }) {
       let monthly = 0;
       let yearly = 0;
 
-      if (donationFrequency === "Daily") {
-        daily = amountValue;
-        weekly = amountValue * 7;
-        monthly = amountValue * 28;
-        yearly = amountValue * 365;
-      } else if (donationFrequency === "Weekly") {
+      if (donationFrequency === "Weekly") {
         weekly = amountValue;
         daily = amountValue / 7;
         monthly = amountValue * 4;
@@ -79,7 +87,6 @@ export default function DonatePage({ searchParams }) {
       }
 
       return {
-        Daily: daily.toFixed(0),
         Weekly: weekly.toFixed(0),
         Monthly: monthly.toFixed(0),
         Yearly: yearly.toFixed(0),
@@ -91,7 +98,6 @@ export default function DonatePage({ searchParams }) {
   const [message, setMessage] = useState("");
   const minAmounts = {
     "One-Time": 50,
-    Daily: 5,
     Weekly: 20,
     Monthly: 50,
     Yearly: 365,
@@ -715,28 +721,51 @@ export default function DonatePage({ searchParams }) {
                       <p className="text-slate-500 text-center">How much would you like to contribute?</p>
                     </div>
 
-                    <div className="space-y-4">
-                      <div className="flex flex-wrap gap-2">
-                        {["One-Time", "Daily", "Weekly", "Monthly", "Yearly"].map((freq) => (
-                          <button
-                            key={freq}
-                            onClick={() => {
-                              if (freq === "One-Time") {
-                                setIsRecurring(false);
-                                setDonationFrequency("One-Time");
-                              } else {
-                                setIsRecurring(true);
-                                setDonationFrequency(freq);
-                              }
-                            }}
-                            className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${(freq === "One-Time" && !isRecurring) || (isRecurring && donationFrequency === freq)
-                              ? "bg-emerald-600 text-white"
-                              : "bg-slate-50 text-slate-500 hover:bg-slate-100"
-                              }`}
-                          >
-                            {freq}
-                          </button>
-                        ))}
+                    <div className="space-y-2" ref={frequencyRef}>
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setIsFrequencyOpen(!isFrequencyOpen)}
+                          className={`w-full bg-slate-50 border-2 border-slate-100 px-5 h-14 rounded-xl focus:outline-none focus:border-emerald-500 focus:bg-white transition-all text-slate-900 font-bold flex items-center justify-between hover:bg-white/50 ${isFrequencyOpen ? 'border-emerald-500 ring-4 ring-emerald-500/10' : ''}`}
+                        >
+                          <span className="text-base">{isRecurring ? donationFrequency : "One-Time"}</span>
+                          <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform duration-200 ${isFrequencyOpen ? 'rotate-180 text-emerald-500' : ''}`} />
+                        </button>
+
+                        <AnimatePresence>
+                          {isFrequencyOpen && (
+                            <motion.div
+                              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                              transition={{ duration: 0.2, ease: "easeOut" }}
+                              className="absolute z-50 w-full mt-2 bg-white border border-slate-100 rounded-xl shadow-2xl shadow-emerald-900/5 overflow-hidden py-1"
+                            >
+                              {["One-Time", "Weekly", "Monthly", "Yearly"].map((freq) => (
+                                <button
+                                  key={freq}
+                                  type="button"
+                                  onClick={() => {
+                                    if (freq === "One-Time") {
+                                      setIsRecurring(false);
+                                      setDonationFrequency("One-Time");
+                                    } else {
+                                      setIsRecurring(true);
+                                      setDonationFrequency(freq);
+                                    }
+                                    setIsFrequencyOpen(false);
+                                  }}
+                                  className={`w-full px-5 py-3 text-left transition-colors font-bold text-sm ${(freq === "One-Time" && !isRecurring) || (isRecurring && donationFrequency === freq)
+                                      ? "bg-emerald-50 text-emerald-600"
+                                      : "text-slate-600 hover:bg-slate-50 hover:text-emerald-500"
+                                    }`}
+                                >
+                                  {freq}
+                                </button>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     </div>
 
@@ -789,9 +818,8 @@ export default function DonatePage({ searchParams }) {
                         <h3 className="font-bold text-slate-900 text-center">
                           Your Contribution Impact
                         </h3>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                           {[
-                            { label: "Daily", val: impact.Daily },
                             { label: "Weekly", val: impact.Weekly },
                             { label: "Monthly", val: impact.Monthly },
                             { label: "Yearly", val: impact.Yearly },

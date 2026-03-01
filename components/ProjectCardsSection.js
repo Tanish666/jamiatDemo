@@ -3,12 +3,24 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
-import { Users, Calendar, ChevronRight } from "lucide-react";
+import { Users, Calendar } from "lucide-react";
 import Image from "next/image";
 
 import ShareButton from "./ShareButton";
+import { Playfair_Display } from "next/font/google";
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
 
 // Utils
+const stripHtml = (html) => {
+  if (!html) return "";
+  return html.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim();
+};
+
 const formatCurrency = (amount) => {
   const value = Number(amount) || 0;
   if (value < 1_000) return `₹${value}`;
@@ -27,71 +39,28 @@ const formatNumber = (num) => {
 
 // Skeleton Loader
 const ProjectCardSkeleton = () => (
-  <div className="overflow-hidden bg-white rounded-2xl border border-gray-100 shadow-sm animate-pulse flex flex-col h-full">
-    <div className="h-52 lg:h-60 bg-gray-100"></div>
-    <div className="p-6 space-y-4 flex-grow">
-      {/* Title placeholder */}
-      <div className="space-y-2">
-        <div className="h-6 bg-gray-100 rounded-md w-full"></div>
-        <div className="h-6 bg-gray-100 rounded-md w-2/3"></div>
-      </div>
-      {/* Description placeholder */}
-      <div className="space-y-2 pt-2">
-        <div className="h-3.5 bg-gray-100 rounded-md w-full"></div>
-        <div className="h-3.5 bg-gray-100 rounded-md w-full"></div>
-        <div className="h-3.5 bg-gray-100 rounded-md w-4/5"></div>
-      </div>
-      {/* Bottom stats placeholder */}
-      <div className="pt-8 mt-auto">
-        <div className="h-20 bg-gray-50 rounded-xl w-full"></div>
-      </div>
+  <div className="overflow-hidden bg-white rounded-3xl shadow-sm animate-pulse flex flex-col">
+    <div className="h-48 lg:h-56 bg-gray-100"></div>
+    <div className="p-6 space-y-3">
+      <div className="h-6 bg-gray-100 rounded-lg w-3/4"></div>
+      <div className="h-4 bg-gray-100 rounded-lg w-full"></div>
+      <div className="h-4 bg-gray-100 rounded-lg w-5/6"></div>
     </div>
-    <div className="p-6 pt-0 flex gap-3">
-      <div className="h-12 bg-gray-100 rounded-xl w-full"></div>
+    <div className="p-6 pt-0 space-y-4">
+      <div className="space-y-2">
+        <div className="h-2 bg-gray-100 rounded-full w-full"></div>
+        <div className="flex justify-between">
+          <div className="h-3 bg-gray-100 rounded w-1/4"></div>
+          <div className="h-3 bg-gray-100 rounded w-1/4"></div>
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <div className="h-12 bg-gray-100 rounded-xl w-1/2"></div>
+        <div className="h-12 bg-gray-100 rounded-xl w-1/2"></div>
+      </div>
     </div>
   </div>
 );
-
-// Truncated Description Component
-const TruncatedDescription = ({ html, slug }) => {
-  const [isTruncated, setIsTruncated] = useState(false);
-  const descriptionRef = useRef(null);
-
-  useEffect(() => {
-    const checkTruncation = () => {
-      const el = descriptionRef.current;
-      if (el) {
-        setIsTruncated(el.scrollHeight > el.clientHeight + 1);
-      }
-    };
-    checkTruncation();
-    window.addEventListener("resize", checkTruncation);
-    return () => window.removeEventListener("resize", checkTruncation);
-  }, [html]);
-
-  return (
-    <div className="mt-3 relative">
-      <div
-        ref={descriptionRef}
-        className="text-sm text-gray-600/90 line-clamp-3 leading-relaxed min-h-[72px]"
-        dangerouslySetInnerHTML={{
-          __html: html || "No description available",
-        }}
-      />
-      <div className="mt-2 min-h-[20px]">
-        {isTruncated && (
-          <Link
-            href={`/projects/${slug || ""}`}
-            className="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-700 font-bold text-xs transition-colors group/link"
-          >
-            Read Full Story
-            <ChevronRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
-          </Link>
-        )}
-      </div>
-    </div>
-  );
-};
 
 
 export default function ProjectCardsSection({
@@ -261,14 +230,10 @@ export default function ProjectCardsSection({
   }, [projects, searchTerm, categoryFilter, donationTypeFilter]);
 
   return (
-    <section className="flex flex-col items-center w-full px-4 py-8 sm:px-12 text-gray-900 max-w-[1800px] mx-auto">
+    <section className="flex flex-col items-center w-full px-4 py-8 sm:px-12 text-slate-900">
       {loading && page === 1 ? (
-        <div className="grid w-full gap-6 md:gap-6
-                      grid-cols-1
-                      sm:grid-cols-2
-                      lg:grid-cols-3
-                      xl:grid-cols-4">
-          {Array.from({ length: infiniteScroll ? initialLimit : 3 }).map(
+        <div className="grid w-full md:gap-8 gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {Array.from({ length: infiniteScroll ? initialLimit : 4 }).map(
             (_, i) => (
               <ProjectCardSkeleton key={i} />
             )
@@ -277,107 +242,92 @@ export default function ProjectCardsSection({
       ) : (
         <>
           {/* Projects Grid */}
-          <div className="grid w-full gap-6 md:gap-6
-                      grid-cols-1
-                      sm:grid-cols-2
-                      lg:grid-cols-3
-                      xl:grid-cols-4">
+          <div className="grid w-full md:gap-8 gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredProjects.map((project) => (
               <div
                 key={project?._id}
-                className="group overflow-hidden bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-emerald-900/10 transition-all duration-300 flex flex-col h-full"
+                className="group overflow-hidden bg-white rounded-[2rem] shadow-sm hover:shadow-2xl transition-all duration-500 lg:hover:-translate-y-2 lg:hover:scale-[1.02] flex flex-col border border-slate-100"
               >
                 {/* Image & Share */}
-                <div className="h-52 lg:h-60 relative overflow-hidden">
+                <div className="h-48 lg:h-56 relative">
                   <Image
                     src={project?.cardImage || project?.mainImage}
                     alt={project?.title || "Project"}
                     fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 33vw, 25vw"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500"></div>
-
-                  {/* Category Badges */}
-                  <div className="absolute top-3 left-3 flex gap-1.5 flex-wrap">
-                    {Array.isArray(project?.category) && project.category.slice(0, 2).map((cat, idx) => (
-                      <span key={idx} className="bg-emerald-600/90 backdrop-blur-md text-white px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-lg">
-                        {cat}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="absolute top-3 right-3 transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#06422d]/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="absolute top-2 right-2">
                     <ShareButton slug={project?.slug || ""} />
                   </div>
                 </div>
 
                 {/* Title & Description */}
-                <div className="p-6 pb-4">
-                  <h3 className="text-xl text-emerald-900 font-bold min-h-[56px] line-clamp-2 leading-tight group-hover:text-emerald-700 transition-colors">
+                <div className="p-6 pb-2">
+                  <h3 className={`${playfair.className} text-xl text-[#06422d] font-bold h-[56px] line-clamp-2 mb-3 tracking-tight`}>
                     {project?.title || "Untitled Project"}
                   </h3>
-                  <TruncatedDescription
-                    html={project?.description}
-                    slug={project?.slug}
-                  />
+                  <div className="h-[72px] mb-3 overflow-hidden">
+                    <p className="text-sm text-gray-600 inline leading-relaxed">
+                      {(() => {
+                        const text = stripHtml(project?.description) || "No description available";
+                        return text.length > 85 ? text.substring(0, 85).trim() + "..." : text;
+                      })()}
+                    </p>
+                    <Link
+                      href={`/projects/${project?.slug || ""}`}
+                      className="text-emerald-700 hover:text-emerald-800 text-sm font-semibold hover:underline ml-1 inline whitespace-nowrap"
+                    >
+                      View more
+                    </Link>
+                  </div>
                 </div>
 
                 {/* Stats & Buttons */}
-                <div className="p-6 pt-0 flex flex-col flex-grow space-y-5">
+                <div className="p-6 pt-0 flex flex-col flex-grow space-y-4">
                   {project?.totalRequired > 0 ? (
                     <>
-                      <div className="space-y-2.5 mt-auto">
-                        <div className="flex justify-between items-end text-sm">
-                          <span className="text-gray-500 font-medium tracking-wide flex items-center gap-1.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                            PROGRESS
-                          </span>
-                          <span className="font-bold text-emerald-950">
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Progress</span>
+                          <span className="font-bold text-[#06422d]">
                             {project?.completion ?? 0}%
                           </span>
                         </div>
-                        <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner p-0.5">
+                        <div className="h-2 w-full bg-emerald-50 rounded-full overflow-hidden border border-emerald-100/50">
                           <div
-                            className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full transition-all duration-1000 ease-out relative shadow-[0_0_8px_rgba(16,185,129,0.3)]"
+                            className="h-full bg-emerald-600 transition-all duration-700"
                             style={{ width: `${project?.completion || 0}%` }}
-                          >
-                            <div className="absolute inset-0 bg-white/20 animate-shimmer"></div>
-                          </div>
+                          />
                         </div>
-                        <div className="flex justify-between items-center bg-emerald-50/50 p-3 rounded-xl border border-emerald-100/50">
-                          <div className="flex flex-col">
-                            <span className="text-[10px] text-emerald-700 font-bold uppercase tracking-tighter">Raised</span>
-                            <span className="text-lg font-black text-emerald-800 leading-none">
-                              {formatCurrency(project?.collected ?? 0)}
-                            </span>
-                          </div>
-                          <div className="flex flex-col items-end">
-                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">Goal</span>
-                            <span className="text-base font-bold text-gray-700 leading-none">
-                              {formatCurrency(project?.totalRequired ?? 0)}
-                            </span>
-                          </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-emerald-600 font-semibold">
+                            {formatCurrency(project?.collected ?? 0)}
+                          </span>
+                          <span className="text-gray-600">
+                            of {formatCurrency(project?.totalRequired ?? 0)}
+                          </span>
                         </div>
                       </div>
                     </>
                   ) : (
-                    <div className="flex justify-between items-center bg-emerald-50/30 p-4 rounded-xl border border-emerald-100/50 mt-auto min-h-[70px]">
-                      <div className="flex flex-col">
-                        <span className="text-[10px] uppercase text-emerald-600 font-black tracking-widest leading-tight">
-                          Collected
+                    <div className="flex justify-between bg-white p-4">
+                      <div className="flex flex-col items-center font-bold text-center">
+                        <span className="text-xs uppercase text-gray-500">
+                          Total Collected
                         </span>
-                        <span className="text-xl font-black text-emerald-800 leading-none mt-1">
+                        <span className="text-lg text-[#06422d]">
                           {formatCurrency(
                             project?.donationSummary?.totalCollected ?? 0
                           )}
                         </span>
                       </div>
-                      <div className="flex flex-col items-end">
-                        <span className="text-[10px] uppercase text-gray-500 font-black tracking-widest leading-tight">
-                          Donors
+                      <div className="flex flex-col items-center font-bold text-center">
+                        <span className="text-xs uppercase text-gray-500">
+                          Total Donors
                         </span>
-                        <span className="text-xl font-black text-gray-800 leading-none mt-1">
+                        <span className="text-lg text-gray-800">
                           {project?.donationSummary?.totalDonors ?? 0}
                         </span>
                       </div>
@@ -385,7 +335,7 @@ export default function ProjectCardsSection({
                   )}
 
                   {/* Action Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-3 mt-4">
+                  <div className="flex flex-col sm:flex-row gap-1.5 mt-auto">
                     {project?.status !== "Completed" && (
                       <Link
                         href={
@@ -393,14 +343,14 @@ export default function ProjectCardsSection({
                             ? "/login"
                             : `/donate/${project?.slug || ""}`
                         }
-                        className="w-full sm:flex text-center bg-gradient-to-br from-emerald-600 to-emerald-700 text-white py-3 px-4 rounded-xl hover:shadow-lg hover:shadow-emerald-900/20 active:scale-95 transition-all font-bold text-sm tracking-wide justify-center items-center"
+                        className="w-full sm:flex-1 text-center bg-[#06422d] text-white py-2 px-1 rounded-xl hover:bg-emerald-800 text-sm font-bold transition-all duration-300 active:scale-[0.98] shadow-lg shadow-emerald-900/10 whitespace-nowrap"
                       >
                         Donate Now
                       </Link>
                     )}
                     <Link
                       href={`/projects/${project?.slug || ""}`}
-                      className="w-full sm:flex-1 text-center border-2 border-emerald-600 text-emerald-600 py-3 px-4 rounded-xl hover:bg-emerald-50 active:scale-95 transition-all font-bold text-sm tracking-wide shadow-sm"
+                      className="w-full sm:flex-1 text-center border-2 border-emerald-900 text-emerald-900 py-2 px-1 rounded-xl hover:bg-emerald-50 text-sm font-bold transition-all duration-300 active:scale-[0.98] whitespace-nowrap"
                     >
                       View Details
                     </Link>
@@ -414,15 +364,23 @@ export default function ProjectCardsSection({
           {infiniteScroll && hasMore && (
             <div
               ref={loaderRef}
-              className="grid w-full gap-6 md:gap-6
-               grid-cols-1
-               sm:grid-cols-2
-               lg:grid-cols-3
-               xl:grid-cols-4"
+              className="mt-6 grid w-full md:gap-8 gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
             >
-              {Array.from({ length: infiniteScroll ? initialLimit : 3 }).map((_, i) => (
+              {Array.from({ length: infiniteScroll ? initialLimit : 4 }).map((_, i) => (
                 <ProjectCardSkeleton key={`skeleton-${i}`} />
               ))}
+            </div>
+          )}
+
+          {/* View More Projects Option */}
+          {!infiniteScroll && (
+            <div className="mt-8 flex justify-center w-full">
+              <Link
+                href="/projects"
+                className="px-10 py-4 bg-white border-2 border-emerald-900 text-emerald-900 rounded-xl hover:bg-emerald-50 font-bold transition-all duration-300 active:scale-[0.98] shadow-xl hover:shadow-md"
+              >
+                View More Projects
+              </Link>
             </div>
           )}
         </>
@@ -430,3 +388,4 @@ export default function ProjectCardsSection({
     </section>
   );
 }
+
