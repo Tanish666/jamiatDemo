@@ -36,6 +36,7 @@ async function getHeroData() {
 export default function Home() {
   const [quote, setQuote] = useState(null);
   const [heroData, setHeroData] = useState(null);
+  const [socialHighlights, setSocialHighlights] = useState(null);
 
   const schemaData = {
     "@context": "https://schema.org",
@@ -356,6 +357,24 @@ export default function Home() {
     fetchQuote();
   }, []);
 
+  useEffect(() => {
+    async function fetchSocialHighlights() {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/homesocialhighlight`,
+          {
+            next: { revalidate: 3600 },
+          }
+        );
+        const data = await res.json();
+        setSocialHighlights(data);
+      } catch (e) {
+        setSocialHighlights(null);
+      }
+    }
+    fetchSocialHighlights();
+  }, []);
+
   return (
     <>
       <head>
@@ -473,7 +492,7 @@ export default function Home() {
         </section>
 
 
-        <SocialGallery />
+        <SocialGallery data={socialHighlights} />
 
       </div>
     </>
