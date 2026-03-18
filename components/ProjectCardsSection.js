@@ -1,6 +1,8 @@
 "use client";
 
+
 import { useEffect, useState, useMemo, useRef } from "react";
+import { useScroll, useMotionValueEvent } from "framer-motion";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { Users, Calendar } from "lucide-react";
@@ -76,7 +78,7 @@ export default function ProjectCardsSection({
   const [hasMore, setHasMore] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null);
   const { isSignedIn } = useUser();
-  const loaderRef = useRef(null);
+  const loadingRef = useRef(false);
 
   // Fetch data
   useEffect(() => {
@@ -169,6 +171,7 @@ export default function ProjectCardsSection({
         }
       } finally {
         setLoading(false);
+        loadingRef.current = false;
       }
     }
 
@@ -176,22 +179,17 @@ export default function ProjectCardsSection({
     return () => controller.abort();
   }, [page, initialLimit]);
 
-  // Infinite scroll observer
-  useEffect(() => {
-    if (!infiniteScroll || !loaderRef.current) return;
+  // Infinite scroll using framer-motion useScroll
+  const { scrollYProgress } = useScroll();
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loading) {
-          setPage((prev) => prev + 1);
-        }
-      },
-      { threshold: 1 }
-    );
-
-    observer.observe(loaderRef.current);
-    return () => observer.disconnect();
-  }, [infiniteScroll, hasMore, loading]);
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    if (!infiniteScroll || !hasMore || loading || loadingRef.current) return;
+    // When user has scrolled past 80% of the page, load more
+    if (latest > 0.5) {
+      loadingRef.current = true;
+      setPage((prev) => prev + 1);
+    }
+  });
 
   // Filtering
   const filteredProjects = useMemo(() => {
@@ -364,7 +362,6 @@ export default function ProjectCardsSection({
           {/* Infinite scroll loader */}
           {infiniteScroll && hasMore && (
             <div
-              ref={loaderRef}
               className="mt-6 grid w-full md:gap-8 gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
             >
               {Array.from({ length: infiniteScroll ? initialLimit : 4 }).map((_, i) => (
