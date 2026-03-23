@@ -81,17 +81,17 @@ export default function HomePageHeroSection({ hero }) {
                                 {/* Badge */}
                                 <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-1.5 rounded-full text-sm font-semibold border border-emerald-100 animate-fade-in">
 
-                                    <span>Supporting Families Since 1919</span>
+                                    <span>{hero.pill || "Supporting Families Since 1919"}</span>
                                 </div>
 
                                 {/* Heading */}
                                 <h1 className={`${playfair.className} text-4xl lg:text-6xl xl:text-7xl font-bold text-slate-900 leading-[1.1] tracking-tight`}>
-                                    {"Empowering the Ummah, Building the Future"}
+                                    {hero.title || "Empowering the Ummah, Building the Future"}
                                 </h1>
 
                                 {/* Subtitle */}
                                 <p className="text-slate-600 text-lg lg:text-xl leading-relaxed max-w-xl">
-                                    {"Join us in making a lasting impact. Your contributions support education, healthcare, and sustainable development for communities in need around the globe."}
+                                    {hero.subtitle || "Join us in making a lasting impact. Your contributions support education, healthcare, and sustainable development for communities in need around the globe."}
                                 </p>
 
                                 {/* CTA Buttons */}
@@ -104,7 +104,7 @@ export default function HomePageHeroSection({ hero }) {
                                         {hero?.ctaText || "Donate Now"}
                                     </Link>
                                     <Link
-                                        href="/impact"
+                                        href={`${hero?.secondaryCTA?.link}`}
                                         className="bg-white text-slate-800 px-8 py-4 text-lg font-semibold 
                                         hover:bg-slate-50 transition-all duration-300 
                                         active:scale-[0.98] 
@@ -113,7 +113,7 @@ export default function HomePageHeroSection({ hero }) {
                                         shadow-2xl hover:shadow-md"
                                     >
                                         <Play className="size-5 fill-emerald-600 text-emerald-600" />
-                                        See Our Impact
+                                        {hero?.secondaryCTA.text || "See Our Impact"}
                                     </Link>
                                 </div>
 

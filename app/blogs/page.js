@@ -294,34 +294,6 @@ export default function BlogsPage() {
             </div>
           </div>
 
-          {/* Newsletter Box */}
-          <div className="bg-[#E7F9F3] rounded-2xl p-8 relative overflow-hidden">
-            <div className="relative z-10 flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm mb-6">
-                <Mail className="text-[#10B981]" size={24} />
-              </div>
-              <h3 className="font-bold text-lg text-[#1F2937] mb-3">Subscribe to our Newsletter</h3>
-              <p className="text-sm text-gray-500 mb-6 leading-relaxed">
-                Get the latest updates, stories of hope, and charity news delivered straight to your inbox.
-              </p>
-              <div className="w-full space-y-3">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="w-full px-4 py-3 bg-white border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 transition-all text-sm placeholder:text-gray-300"
-                />
-                <button className="w-full py-3 bg-[#10B981] text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-200 hover:bg-[#059669] transition-all transform active:scale-[0.98]">
-                  Subscribe
-                </button>
-              </div>
-              <p className="text-[10px] text-emerald-400/60 mt-4 italic font-medium">
-                No spam, just good news.
-              </p>
-            </div>
-
-            {/* Subtle bg decoration */}
-            <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/40 rounded-full blur-2xl"></div>
-          </div>
 
         </aside>
 

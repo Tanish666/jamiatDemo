@@ -120,25 +120,25 @@ const EmergencyDonation = () => {
             time: formatTime(d.createdAt),
             initials: d.name ? d.name.split(' ').map((n: string) => n[0]).filter(Boolean).join('').toUpperCase().slice(0, 2) : "A"
         })) || [
-            {
-                _id: "example-1",
-                name: "Ahmed H.",
-                amount: 5000,
-                dedicatedTo: "In memory of Grandfather",
-                message: "Stay strong!",
-                time: formatTime("2023-11-06T14:30:00Z"),
-                initials: "AH"
-            },
-            {
-                _id: "example-2",
-                name: "Sarah M.",
-                amount: 10000,
-                dedicatedTo: null,
-                message: "Sending prayers.",
-                time: "15 mins ago",
-                initials: "SM"
-            }
-        ]
+                {
+                    _id: "example-1",
+                    name: "Ahmed H.",
+                    amount: 5000,
+                    dedicatedTo: "In memory of Grandfather",
+                    message: "Stay strong!",
+                    time: formatTime("2023-11-06T14:30:00Z"),
+                    initials: "AH"
+                },
+                {
+                    _id: "example-2",
+                    name: "Sarah M.",
+                    amount: 10000,
+                    dedicatedTo: null,
+                    message: "Sending prayers.",
+                    time: "15 mins ago",
+                    initials: "SM"
+                }
+            ]
     };
 
     const raisedFormatted = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(content.stats.raised);
@@ -148,7 +148,7 @@ const EmergencyDonation = () => {
     return (
         <div className="bg-white min-h-screen pb-24">
             {/* Hero / Header Section */}
-            <section className="bg-[#ECFDF5] py-16 lg:py-32 flex flex-col items-center px-4 relative overflow-hidden">
+            <section className="bg-[#ECFDF5] py-16 pt-20 lg:py-32 flex flex-col items-center px-4 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none overflow-hidden">
                     <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[60%] bg-emerald-100/50 rounded-full blur-[100px]" />
                     <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[60%] bg-emerald-50/50 rounded-full blur-[100px]" />
@@ -208,7 +208,7 @@ const EmergencyDonation = () => {
                             {content.gallery.find((item: any) => item.type === 'video') && (() => {
                                 const videoItem = content.gallery.find((item: any) => item.type === 'video');
                                 const isYouTube = videoItem.url?.includes('youtube.com') || videoItem.url?.includes('youtu.be');
-                                
+
                                 // Convert standard YouTube watch URLs to embed URLs if needed
                                 let embedUrl = videoItem.url;
                                 if (isYouTube && !embedUrl.includes('embed/')) {
@@ -219,16 +219,16 @@ const EmergencyDonation = () => {
                                 return (
                                     <div className="sm:col-span-2 bg-gray-200 rounded-2xl h-80 md:h-96 w-full overflow-hidden relative group flex flex-col items-center justify-center">
                                         {isYouTube ? (
-                                            <iframe 
+                                            <iframe
                                                 className="w-full h-full object-cover"
                                                 src={embedUrl}
                                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                                 allowFullScreen
                                             />
                                         ) : (
-                                            <video 
-                                                src={videoItem.url} 
-                                                controls 
+                                            <video
+                                                src={videoItem.url}
+                                                controls
                                                 className="w-full h-full object-cover bg-black"
                                             />
                                         )}
@@ -286,7 +286,7 @@ const EmergencyDonation = () => {
                             const projectRaised = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(project.collected || 0);
                             const projectGoal = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(project.totalRequired || 1);
                             const projectProgress = Math.min(Math.round(((project.collected || 0) / (project.totalRequired || 1)) * 100), 100);
-                            
+
                             return (
                                 <div key={project._id} className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-[0_15px_50px_-12px_rgba(0,0,0,0.08)] flex flex-col items-center">
                                     <div className="w-full text-center mb-6">
@@ -302,13 +302,13 @@ const EmergencyDonation = () => {
                                             <p className="text-gray-500 text-sm font-medium">{project.beneficiaries.toLocaleString()} Beneficiaries</p>
                                         )}
                                     </div>
-    
+
                                     <div className="w-full text-center mb-6">
                                         <p className="text-emerald-700 font-bold text-xs tracking-[0.1em] uppercase mb-2">Fundraising Status</p>
                                         <h4 className={`${playfair.className} text-4xl font-bold text-gray-900 mb-1`}>{projectRaised}</h4>
                                         <p className="text-gray-500 text-sm font-medium">raised of {projectGoal}</p>
                                     </div>
-    
+
                                     <div className="w-full mb-8">
                                         <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-emerald-50 mb-3">
                                             <div className="h-full bg-emerald-600 rounded-full relative overflow-hidden transition-all duration-1000" style={{ width: `${projectProgress}%` }}>
@@ -320,7 +320,7 @@ const EmergencyDonation = () => {
                                             <span className={`px-2 py-0.5 rounded-full text-xs ${project.status === 'Active' ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-600'}`}>{project.status}</span>
                                         </div>
                                     </div>
-    
+
                                     <div className="w-full space-y-3">
                                         <button className="w-full bg-emerald-600 text-white py-4 rounded-full font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 active:scale-[0.98]">
                                             <Heart className="w-5 h-5 fill-current" />
@@ -361,13 +361,13 @@ const EmergencyDonation = () => {
                                                 </p>
                                             </div>
                                             <p className="text-xs text-gray-400 mb-2">{donor.time}</p>
-                                            
+
                                             {donor.dedicatedTo && (
                                                 <p className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded-lg mb-2 inline-block shadow-sm">
                                                     Dedicated: {donor.dedicatedTo}
                                                 </p>
                                             )}
-                                            
+
                                             {donor.message && (
                                                 <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-b-xl rounded-tr-xl border border-gray-100 mt-1 relative">
                                                     <span className="text-gray-300 absolute -top-2 -left-2 text-2xl font-serif leading-none">"</span>

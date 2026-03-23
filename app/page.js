@@ -9,7 +9,7 @@ import Lenis from "lenis";
 import MobileDonationCategories from "../components/donationtype";
 import useResponsiveLimit from "./hooks/useResponsiveLimit";
 import HomePageHeroSection from "../components/homePageHeroSection";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { Sparkles, ArrowRight, Quote } from "lucide-react";
 import { Playfair_Display } from "next/font/google";
 import SocialGallery from "../components/SocialGallery";
 
@@ -419,9 +419,9 @@ export default function Home() {
 
           <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             {/* Decorative Quote Icon */}
-            <div className="mb-0 flex justify-center">
-              <div className="size-16 rounded-2xl bg-amber-100 flex items-center justify-center rotate-3 shadow-sm">
-                <span className="text-5xl text-amber-600 font-serif mb-2 leading-none">"</span>
+            <div className="mb-10 flex justify-center">
+              <div className="rounded-2xl bg-amber-100 flex items-center justify-center shadow-lg shadow-amber-900/5 p-3 hover:rotate-0 transition-transform duration-500 text-sm text-amber-700 font-bold">
+                Qoute For The Day
               </div>
             </div>
 

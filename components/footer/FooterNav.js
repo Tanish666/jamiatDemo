@@ -90,7 +90,7 @@ export default function FooterNav() {
   return (
     <footer className="bg-[#F1F5F9] border-t border-gray-100 font-sans">
       <div className="max-w-8xl mx-auto px-6 py-16 md:px-12 xl:px-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.5fr_0.7fr_1.3fr_1.5fr] gap-12 lg:gap-x-12 xl:gap-x-16">
           {/* Logo & Description */}
           <div className="flex flex-col gap-6">
             <Link href="/" className="flex items-center gap-3 group">

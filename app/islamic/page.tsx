@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Playfair_Display } from "next/font/google";
-import { Calculator, Calendar, BookOpen, MessageCircle, Quote, HelpCircle, Youtube, Video, Play, MoonStar, ArrowRight, Users } from "lucide-react";
+import { Calculator, Calendar, BookOpen, MessageCircle, Quote, HelpCircle, Youtube, Video, Play, MoonStar, ArrowRight, Users, ChevronDown } from "lucide-react";
 
 const playfair = Playfair_Display({
     subsets: ["latin"],
@@ -12,17 +12,21 @@ const playfair = Playfair_Display({
 const Islamic = () => {
     const [toolsData, setToolsData] = useState<any>(null);
     const [dailyData, setDailyData] = useState<any>(null);
+    const [knowledgeData, setKnowledgeData] = useState<any>(null);
+    const [activeQaIndex, setActiveQaIndex] = useState<number | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [toolsRes, dailyRes] = await Promise.all([
+                const [toolsRes, dailyRes, knowledgeRes] = await Promise.all([
                     fetch(`${process.env.NEXT_PUBLIC_API_URL}/islamic-tools`).then(res => res.json()).catch(() => null),
-                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/islamic-daily`).then(res => res.json()).catch(() => null)
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/islamic-daily`).then(res => res.json()).catch(() => null),
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/islamic-knowledge-hub`).then(res => res.json()).catch(() => null)
                 ]);
 
                 if (toolsRes) setToolsData(toolsRes);
                 if (dailyRes) setDailyData(dailyRes);
+                if (knowledgeRes) setKnowledgeData(knowledgeRes);
             } catch (error) {
                 console.error("Error fetching Islamic data:", error);
             }
@@ -197,29 +201,50 @@ const Islamic = () => {
                                     <HelpCircle className="h-10 w-10 text-emerald-600" />
                                 </div>
                                 <div>
-                                    <h3 className={`${playfair.className} text-3xl font-bold text-[#1a2e35]`}>Islamic Q&A</h3>
-                                    <p className="text-emerald-600 font-bold text-sm tracking-wider uppercase mt-1">Frequently Asked</p>
+                                    <h3 className={`${playfair.className} text-3xl font-bold text-[#1a2e35]`}>
+                                        {knowledgeData?.qaTitle || "Islamic Q&A"}
+                                    </h3>
+                                    <p className="text-emerald-600 font-bold text-sm tracking-wider uppercase mt-1">
+                                        {knowledgeData?.qaSubtitle || "Frequently Asked"}
+                                    </p>
                                 </div>
                             </div>
                             <div className="space-y-4 mb-10 flex-grow pt-4 border-t border-gray-100">
-                                {[
-                                    "What are the conditions for Zakat to be obligatory?",
-                                    "How to perform Salatul Tasbeeh?",
-                                    "What is the ruling on fasting while traveling?",
-                                ].map((question, i) => (
-                                    <div key={i} className="flex gap-4 p-5 bg-gray-50 rounded-3xl hover:bg-emerald-50 transition-colors cursor-pointer group border border-gray-100">
-                                        <HelpCircle className="w-6 h-6 text-emerald-500 flex-shrink-0" />
-                                        <span className="text-gray-700 font-medium group-hover:text-emerald-800 transition-colors">{question}</span>
+                                {(knowledgeData?.qaItems || [
+                                    { question: "What are the conditions for Zakat to be obligatory?", answer: "Zakat is obligatory on every sane, adult Muslim who owns wealth exceeding the Nisab for a full lunar year." },
+                                    { question: "How to perform Salatul Tasbeeh?", answer: "Salatul Tasbeeh is a special prayer that includes 300 repetitions of specific tasbeeh praises." },
+                                    { question: "What is the ruling on fasting while traveling?", answer: "Fasting is excused for travelers who find it difficult, though it must be made up later." },
+                                ]).map((item: any, i: number) => (
+                                    <div 
+                                        key={item._id || i} 
+                                        className={`flex flex-col gap-2 p-5 rounded-3xl transition-all duration-300 border border-gray-100 cursor-pointer group ${activeQaIndex === i ? 'bg-emerald-50 border-emerald-200' : 'bg-gray-50 hover:bg-emerald-50'}`}
+                                        onClick={() => setActiveQaIndex(activeQaIndex === i ? null : i)}
+                                    >
+                                        <div className="flex items-center justify-between gap-4">
+                                            <div className="flex items-center gap-4">
+                                                <HelpCircle className={`w-6 h-6 flex-shrink-0 transition-colors ${activeQaIndex === i ? 'text-emerald-600' : 'text-emerald-500'}`} />
+                                                <span className={`font-medium transition-colors ${activeQaIndex === i ? 'text-emerald-800' : 'text-gray-700 group-hover:text-emerald-800'}`}>
+                                                    {item.question}
+                                                </span>
+                                            </div>
+                                            <ChevronDown className={`w-5 h-5 text-emerald-600 transition-transform duration-300 ${activeQaIndex === i ? 'rotate-180' : ''}`} />
+                                        </div>
+                                        
+                                        <div className={`overflow-hidden transition-all duration-300 ${activeQaIndex === i ? 'max-h-[300px] opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
+                                            <p className="text-gray-600 leading-relaxed text-sm pl-10">
+                                                {item.answer}
+                                            </p>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
                             <div className="flex flex-col sm:flex-row gap-4">
-                                <button className="flex-1 bg-emerald-600 text-white px-6 py-4 rounded-full font-bold hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-200 transition-all text-center">
-                                    Ask a Question
-                                </button>
-                                <button className="flex-1 border-2 border-emerald-600 text-emerald-600 px-6 py-4 rounded-full font-bold hover:bg-emerald-50 transition-all flex items-center justify-center gap-2">
-                                    <Youtube className="w-5 h-5 text-red-500" /> Watch Q&A
-                                </button>
+                                <a
+                                    href={knowledgeData?.button2Url || "/videos"}
+                                    className="flex-1 border-2 border-emerald-600 text-emerald-600 px-6 py-4 rounded-full font-bold hover:bg-emerald-50 transition-all flex items-center justify-center gap-2"
+                                >
+                                    <Youtube className="w-5 h-5 text-red-500" /> {knowledgeData?.button2Text || "Watch Q&A"}
+                                </a>
                             </div>
                         </div>
 
@@ -230,27 +255,36 @@ const Islamic = () => {
                                     <Video className="h-10 w-10 text-emerald-600" />
                                 </div>
                                 <div>
-                                    <h3 className={`${playfair.className} text-3xl font-bold text-[#1a2e35]`}>Recent Bayans</h3>
-                                    <p className="text-emerald-600 font-bold text-sm tracking-wider uppercase mt-1">Latest Videos</p>
+                                    <h3 className={`${playfair.className} text-3xl font-bold text-[#1a2e35]`}>
+                                        {knowledgeData?.videoSectionTitle || "Recent Bayans"}
+                                    </h3>
+                                    <p className="text-emerald-600 font-bold text-sm tracking-wider uppercase mt-1">
+                                        {knowledgeData?.videoSectionSubtitle || "Latest Videos"}
+                                    </p>
                                 </div>
                             </div>
 
                             <div className="relative rounded-[32px] overflow-hidden mb-8 aspect-video bg-gray-800 group cursor-pointer shadow-lg">
                                 <img src="https://images.unsplash.com/photo-1579705745131-c100e00a4982?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Bayan Thumbnail" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="w-16 h-16 lg:w-20 lg:h-20 bg-emerald-600/90 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-emerald-500 transition-colors shadow-2xl">
+                                    <a
+                                        href={knowledgeData?.videoUrl || "#"}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="w-16 h-16 lg:w-20 lg:h-20 bg-emerald-600/90 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-emerald-500 transition-colors shadow-2xl"
+                                    >
                                         <Play className="w-6 h-6 lg:w-8 lg:h-8 text-white ml-1 lg:ml-2" />
-                                    </div>
+                                    </a>
                                 </div>
                             </div>
 
                             <div className="pt-4 border-t border-gray-100">
-                                <h4 className="font-bold text-[#1a2e35] text-xl mb-3">Importance of Sabr in Islam</h4>
-                                <p className="text-gray-500 text-base mb-8 flex-grow leading-relaxed">A profound reminder on maintaining patience during difficult times and seeking Allah's help in our daily lives.</p>
-
-                                <button className="w-full inline-flex items-center justify-center gap-2 text-emerald-700 font-bold hover:gap-4 transition-all">
-                                    View All Bayans <ArrowRight className="h-5 w-5" />
-                                </button>
+                                <h4 className="font-bold text-[#1a2e35] text-xl mb-3">
+                                    {knowledgeData?.videoTitle || "Importance of Sabr in Islam"}
+                                </h4>
+                                <p className="text-gray-500 text-base mb-8 flex-grow leading-relaxed">
+                                    {knowledgeData?.videoSubtitle || "A profound reminder on maintaining patience during difficult times and seeking Allah's help in our daily lives."}
+                                </p>
                             </div>
                         </div>
                     </div>
