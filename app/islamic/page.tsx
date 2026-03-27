@@ -209,7 +209,7 @@ const Islamic = () => {
                                     </p>
                                 </div>
                             </div>
-                            <div className="space-y-4 mb-10 flex-grow pt-4 border-t border-gray-100">
+                            <div className="space-y-4 mb-10 flex-grow pt-4 border-t border-gray-100 max-h-[480px] overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin', scrollbarColor: '#a7f3d0 transparent' }}>
                                 {(knowledgeData?.qaItems || [
                                     { question: "What are the conditions for Zakat to be obligatory?", answer: "Zakat is obligatory on every sane, adult Muslim who owns wealth exceeding the Nisab for a full lunar year." },
                                     { question: "How to perform Salatul Tasbeeh?", answer: "Salatul Tasbeeh is a special prayer that includes 300 repetitions of specific tasbeeh praises." },
@@ -230,8 +230,8 @@ const Islamic = () => {
                                             <ChevronDown className={`w-5 h-5 text-emerald-600 transition-transform duration-300 ${activeQaIndex === i ? 'rotate-180' : ''}`} />
                                         </div>
                                         
-                                        <div className={`overflow-hidden transition-all duration-300 ${activeQaIndex === i ? 'max-h-[300px] opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
-                                            <p className="text-gray-600 leading-relaxed text-sm pl-10">
+                                        <div className={`transition-all duration-300 ${activeQaIndex === i ? 'max-h-[300px] opacity-100 mt-2 overflow-y-auto' : 'max-h-0 opacity-0 overflow-hidden'}`} style={{ scrollbarWidth: 'thin', scrollbarColor: '#a7f3d0 transparent' }}>
+                                            <p className="text-gray-600 leading-relaxed text-sm pl-10 pr-2">
                                                 {item.answer}
                                             </p>
                                         </div>
@@ -264,19 +264,45 @@ const Islamic = () => {
                                 </div>
                             </div>
 
-                            <div className="relative rounded-[32px] overflow-hidden mb-8 aspect-video bg-gray-800 group cursor-pointer shadow-lg">
-                                <img src="https://images.unsplash.com/photo-1579705745131-c100e00a4982?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Bayan Thumbnail" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <a
-                                        href={knowledgeData?.videoUrl || "#"}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="w-16 h-16 lg:w-20 lg:h-20 bg-emerald-600/90 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-emerald-500 transition-colors shadow-2xl"
-                                    >
-                                        <Play className="w-6 h-6 lg:w-8 lg:h-8 text-white ml-1 lg:ml-2" />
-                                    </a>
-                                </div>
-                            </div>
+                            {(() => {
+                                const videoUrl = knowledgeData?.videoUrl;
+                                const isYouTube = videoUrl?.includes('youtube.com') || videoUrl?.includes('youtu.be');
+
+                                let embedUrl = videoUrl;
+                                if (isYouTube && !embedUrl.includes('embed/')) {
+                                    const videoId = embedUrl.split('v=')[1]?.split('&')[0] || embedUrl.split('youtu.be/')[1]?.split('?')[0];
+                                    if (videoId) embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                                }
+
+                                if (isYouTube) {
+                                    return (
+                                        <div className="relative rounded-[32px] overflow-hidden mb-8 aspect-video bg-gray-800 shadow-lg">
+                                            <iframe
+                                                className="w-full h-full"
+                                                src={embedUrl}
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                            />
+                                        </div>
+                                    );
+                                }
+
+                                return (
+                                    <div className="relative rounded-[32px] overflow-hidden mb-8 aspect-video bg-gray-800 group cursor-pointer shadow-lg">
+                                        <img src="https://images.unsplash.com/photo-1579705745131-c100e00a4982?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Bayan Thumbnail" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <a
+                                                href={knowledgeData?.videoUrl || "#"}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="w-16 h-16 lg:w-20 lg:h-20 bg-emerald-600/90 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-emerald-500 transition-colors shadow-2xl"
+                                            >
+                                                <Play className="w-6 h-6 lg:w-8 lg:h-8 text-white ml-1 lg:ml-2" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                );
+                            })()}
 
                             <div className="pt-4 border-t border-gray-100">
                                 <h4 className="font-bold text-[#1a2e35] text-xl mb-3">

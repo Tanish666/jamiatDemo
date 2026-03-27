@@ -3,16 +3,30 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  Users,
-  GraduationCap,
-  Heart,
-  Calculator,
-  ArrowRight,
-  ChevronRight,
-  Globe,
-  Quote,
-  Droplets,
-  HandCoins,
+  // General & Basic
+  Heart, Star, Home, Book, BookOpen, GraduationCap, School, Award, Trophy, Medal, Target, Shield, ShieldCheck, Lock, Unlock, Key, Lightbulb, Zap, Flame, Sparkles, Gem, Search, Scan, Focus, Eye, EyeOff,
+  // People & Community
+  Users, User, UserCheck, Baby, HandHeart, Handshake, HeartHandshake, Smile, Frown, ThumbsUp, ThumbsDown,
+  // Health & Medical
+  Hospital, Stethoscope, Pill, Syringe, Activity, HeartPulse, Microscope, TestTube, Atom, Dna, Brain,
+  // Buildings & Finance
+  Building, Building2, Church, Landmark, Briefcase, Wallet, Banknote, Coins, PiggyBank, TrendingUp, BarChart3, PieChart, LineChart,
+  // Food, Nature & Weather
+  Apple, Utensils, CookingPot, Wheat, Droplets, Droplet, Trees, TreePine, Leaf, Sprout, Flower2, Sun, Moon, Cloud, CloudRain, CloudSun, Umbrella, Wind, Snowflake, Mountain, Waves, Fish, Bird, PawPrint,
+  // Travel & Navigation
+  Globe, Globe2, Map, MapPin, Compass, Navigation, Car, Bus, Train, Plane, Ship, Bike, Tent, Backpack, Flag, Rocket,
+  // Communication & Tech
+  Phone, Mail, MessageCircle, Send, Bell, Megaphone, Laptop, Monitor, Smartphone, Wifi, Signal, Bluetooth, Share2, Link as LucideLink, ExternalLink,
+  // Creative & Media
+  Music, Palette, Paintbrush, Camera, Film, Mic,
+  // Tools & E-commerce
+  Wrench, Hammer, Settings, Cog, CircleDot, Package, Gift, ShoppingBag, ShoppingCart, Store,
+  // Files & Management
+  FileText, File, FolderOpen, ClipboardList, Newspaper, Calendar, Clock, Timer, Hourglass, AlarmClock, ScrollText, BookMarked, LayoutGrid, Grid3X3, List, Rows3, Columns3,
+  // Misc & Utilities
+  ArrowRight, ArrowUp, CheckCircle, XCircle, AlertCircle, Info, Download, Upload, Recycle, RefreshCw, RotateCcw, Repeat, Infinity, Cross, Scale, Gavel, Crown,
+  // Existing/Additional
+  Calculator, Quote, ChevronRight
 } from "lucide-react";
 import { Playfair_Display } from "next/font/google";
 
@@ -22,10 +36,47 @@ const playfair = Playfair_Display({
 });
 
 const ICON_MAP = {
-  GraduationCap,
-  Heart,
-  Users,
-  Calculator,
+  // General & Basic
+  Heart, Star, Home, Book, BookOpen, GraduationCap, School, Award, Trophy, Medal, Target, Shield, ShieldCheck, Lock, Unlock, Key, Lightbulb, Zap, Flame, Sparkles, Gem, Search, Scan, Focus, Eye, EyeOff,
+  // People & Community
+  Users, User, UserCheck, Baby, HandHeart, Handshake, HeartHandshake, Smile, Frown, ThumbsUp, ThumbsDown,
+  // Health & Medical
+  Hospital, Stethoscope, Pill, Syringe, Activity, HeartPulse, Microscope, TestTube, Atom, Dna, Brain,
+  // Buildings & Finance
+  Building, Building2, Church, Landmark, Briefcase, Wallet, Banknote, Coins, PiggyBank, TrendingUp, BarChart3, PieChart, LineChart,
+  // Food, Nature & Weather
+  Apple, Utensils, CookingPot, Wheat, Droplets, Droplet, Trees, TreePine, Leaf, Sprout, Flower2, Sun, Moon, Cloud, CloudRain, CloudSun, Umbrella, Wind, Snowflake, Mountain, Waves, Fish, Bird, PawPrint,
+  // Travel & Navigation
+  Globe, Globe2, Map, MapPin, Compass, Navigation, Car, Bus, Train, Plane, Ship, Bike, Tent, Backpack, Flag, Rocket,
+  // Communication & Tech
+  Phone, Mail, MessageCircle, Send, Bell, Megaphone, Laptop, Monitor, Smartphone, Wifi, Signal, Bluetooth, Share2, Link: LucideLink, ExternalLink,
+  // Creative & Media
+  Music, Palette, Paintbrush, Camera, Film, Mic,
+  // Tools & E-commerce
+  Wrench, Hammer, Settings, Cog, CircleDot, Package, Gift, ShoppingBag, ShoppingCart, Store,
+  // Files & Management
+  FileText, File, FolderOpen, ClipboardList, Newspaper, Calendar, Clock, Timer, Hourglass, AlarmClock, ScrollText, BookMarked, LayoutGrid, Grid3X3, List, Rows3, Columns3,
+  // Misc & Utilities
+  ArrowRight, ArrowUp, CheckCircle, XCircle, AlertCircle, Info, Download, Upload, Recycle, RefreshCw, RotateCcw, Repeat, Infinity, Cross, Scale, Gavel, Crown,
+  // Existing/Additional
+  Calculator, Quote, ChevronRight,
+
+  // Semantic Aliases & Fallbacks
+  education: GraduationCap,
+  school: School,
+  healthcare: Hospital,
+  health: HeartPulse,
+  women: Users,
+  social: Heart,
+  economic: Calculator,
+  livelihood: Briefcase,
+  water: Droplets,
+  infrastructure: Building,
+  legal: Scale,
+  environment: Sprout,
+  children: Baby,
+  disaster: CloudRain,
+  electricity: Zap,
 };
 
 const Impact = () => {
@@ -196,16 +247,20 @@ const Impact = () => {
           {/* Tab content */}
           <div className="mt-12">
             {tabContent?.categories?.map(
-              ({ key, color, title, subtitle, stats, description, link }) =>
+              ({ key, color, title, subtitle, stats, description, link, icon }) =>
                 activeTab === key && (
                   <div key={key} className="bg-[#F8FAFC] rounded-[48px] p-8 lg:p-16 border border-gray-100 shadow-sm animate-in fade-in duration-500 max-w-4xl mx-auto">
                     <div className="space-y-8">
                       <div className="flex items-center gap-6">
                         <div className="bg-white w-20 h-20 rounded-[28px] shadow-xl flex items-center justify-center flex-shrink-0 border border-emerald-50">
-                          {key === "education" && <GraduationCap className="h-10 w-10 text-emerald-600" />}
-                          {key === "healthcare" && <Heart className="h-10 w-10 text-emerald-600" />}
-                          {key === "women" && <Users className="h-10 w-10 text-emerald-600" />}
-                          {key === "economic" && <Calculator className="h-10 w-10 text-emerald-600" />}
+                          {(() => {
+                            // Handle cases where icon might be a path/URL or prefixed string
+                            const rawIcon = icon?.split("/")?.pop()?.split(".")?.[0];
+                            const cleanIcon = (rawIcon || icon)?.replace("Lucide", "");
+                            
+                            const IconComponent = ICON_MAP[cleanIcon] || ICON_MAP[icon] || ICON_MAP[key] || GraduationCap;
+                            return <IconComponent className="h-10 w-10 text-emerald-600" />;
+                          })()}
                         </div>
                         <div>
                           <h3 className={`${playfair.className} text-3xl font-bold text-[#1a2e35]`}>{title}</h3>

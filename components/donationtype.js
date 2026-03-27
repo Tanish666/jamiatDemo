@@ -1,4 +1,7 @@
-import { Heart, Gift, Coins, Target } from "lucide-react";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { Heart, Gift, Coins, Target, HelpCircle } from "lucide-react";
 import { Playfair_Display } from "next/font/google";
 import Link from "next/link";
 
@@ -7,41 +10,94 @@ const playfair = Playfair_Display({
   weight: ["400", "700"],
 });
 
+const categoryConfig = {
+  hadiya: {
+    icon: Heart,
+    title: "General Donation",
+    description: "Support our overall mission and let us allocate funds where they're needed most",
+    color: "text-emerald-600",
+    bgColor: "bg-emerald-50",
+    buttonColor: "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200",
+    query: "general"
+  },
+  zakat: {
+    icon: Gift,
+    title: "Zakat",
+    description: "Fulfill your Islamic obligation of Zakat through our verified and transparent programs",
+    color: "text-blue-600",
+    bgColor: "bg-blue-50",
+    buttonColor: "bg-blue-600 hover:bg-blue-700 shadow-blue-200",
+    query: "zakat"
+  },
+  sadqa: {
+    icon: Coins,
+    title: "Sadqa",
+    description: "Give voluntary charity (Sadqa) to earn rewards and help those in need",
+    color: "text-amber-600",
+    bgColor: "bg-amber-50",
+    buttonColor: "bg-amber-600 hover:bg-amber-700 shadow-amber-200",
+    query: "sadqa"
+  },
+  "others(general donations & interest income)": {
+    icon: Target,
+    title: "Others",
+    description: "(general donations & interest income) - Support our missions and let us allocate funds where they're needed most",
+    color: "text-purple-600",
+    bgColor: "bg-purple-50",
+    buttonColor: "bg-purple-600 hover:bg-purple-700 shadow-purple-200",
+    query: "interest_earnings"
+  }
+};
+
 export default function MobileDonationCategories() {
-  const categories = [
-    {
-      icon: Heart,
-      title: "General Donation",
-      description: "Support our overall mission and let us allocate funds where they're needed most",
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-50",
-      buttonColor: "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200"
-    },
-    {
-      icon: Gift,
-      title: "Zakat",
-      description: "Fulfill your Islamic obligation of Zakat through our verified and transparent programs",
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-      buttonColor: "bg-blue-600 hover:bg-blue-700 shadow-blue-200"
-    },
-    {
-      icon: Coins,
-      title: "Sadqa",
-      description: "Give voluntary charity (Sadqa) to earn rewards and help those in need",
-      color: "text-amber-600",
-      bgColor: "bg-amber-50",
-      buttonColor: "bg-amber-600 hover:bg-amber-700 shadow-amber-200"
-    },
-    {
-      icon: Target,
-      title: "Interest Earnings",
-      description: "Donate your interest earnings to purify your wealth according to Islamic principles",
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-      buttonColor: "bg-purple-600 hover:bg-purple-700 shadow-purple-200"
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchDonationTypes() {
+      try {
+        setLoading(true);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donation-types`);
+        const data = await res.json();
+
+        // Map API response to UI configuration
+        const mappedCategories = data
+          .map(item => {
+            const lowerType = item.type.toLowerCase();
+            const config = categoryConfig[lowerType] || categoryConfig[item.type] || {
+              icon: HelpCircle,
+              description: "Make a positive impact with your contribution",
+              color: "text-slate-600",
+              bgColor: "bg-slate-50",
+              buttonColor: "bg-slate-600 hover:bg-slate-700",
+              query: "general"
+            };
+
+            // Custom title handling for the long "others" string
+            const displayTitle = item.type === "others(general donations & interest income)" 
+              ? "Others" 
+              : item.type;
+
+            return {
+              ...config,
+              title: displayTitle,
+              id: item.type
+            };
+          });
+
+        setCategories(mappedCategories);
+      } catch (error) {
+        console.error("Failed to fetch donation types:", error);
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+
+    fetchDonationTypes();
+  }, []);
+
+  if (loading) return null; // Or a skeleton loader if preferred
+  if (categories.length === 0) return null; // Hide section if no enabled categories
 
   return (
     <section className="py-16 lg:py-24 px-4 sm:px-6 lg:px-8 bg-[#F1F5F9] overflow-hidden relative">
@@ -52,7 +108,7 @@ export default function MobileDonationCategories() {
         {/* Heading */}
         <div className="mb-12 sm:mb-20 text-center">
           <h2 className={`${playfair.className} text-4xl font-bold text-slate-900 mb-4 sm:text-6xl tracking-tight`}>
-            Choose Your Donation Type
+            Choose Your Donation Types
           </h2>
           <p className="text-base text-slate-600 sm:text-xl sm:max-w-2xl sm:mx-auto">
             Select the category that aligns with your intention and Islamic principles
@@ -89,13 +145,7 @@ export default function MobileDonationCategories() {
                   href={{
                     pathname: "/projects",
                     query: {
-                      title: category.title === "General Donation"
-                        ? "general"
-                        : category.title === "Zakat"
-                          ? "zakat"
-                          : category.title === "Sadqa" ?
-                            "sadqa"
-                            : "interest_earnings"
+                      title: category.query
                     },
                   }}
                   className={`w-full inline-flex items-center justify-center px-6 py-4 text-white rounded-xl text-sm font-bold shadow-lg transition-all duration-300 active:scale-[0.98] ${category.buttonColor}`}
@@ -110,3 +160,4 @@ export default function MobileDonationCategories() {
     </section>
   );
 }
+

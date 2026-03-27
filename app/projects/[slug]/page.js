@@ -1,5 +1,6 @@
 import ProjectDetailsPage from "../../../components/ProjectDetailsPage";
 import { cache } from "react";
+import { redirect } from "next/navigation";
 
 const getProjectId = cache(getProjectIdFromSlug);
 
@@ -36,6 +37,10 @@ export default async function ProjectPage({ params }) {
     }
   ).then((res) => res.json());
 
+  if (project.slug && project.slug !== slug) {
+    redirect(`/projects/${project.slug}`);
+  }
+
   console.log(project);
 
   return (
@@ -48,7 +53,8 @@ export default async function ProjectPage({ params }) {
           }}
         />
       )}
-      <ProjectDetailsPage slug={slug} projectId={projectId} />
+      <ProjectDetailsPage slug={project.slug || slug} projectId={projectId} />
     </>
   );
 }
+

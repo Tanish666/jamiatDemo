@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { Playfair_Display } from "next/font/google";
@@ -12,8 +12,10 @@ const playfair = Playfair_Display({
 });
 
 export default function Headers() {
+
   const [isOpen, setIsOpen] = useState(false);
   const { user, isSignedIn } = useUser();
+  const [emergencyVisibility, setEmergencyVisibility] = useState(false);
   const pathname = usePathname();
   const navItems = [
     { href: "/", label: "Home" },
@@ -26,6 +28,20 @@ export default function Headers() {
     { href: "/islamic", label: "Islamic" },
     { href: "/emergencyDonation", label: "Emergency Donation" },
   ];
+
+  useEffect(() => {
+    async function getEmergencyVisibility() {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/emergency-fund/toggle`);
+        const data = await res.json();
+        setEmergencyVisibility(data.isActive);
+      } catch (err) {
+        console.error("Error fetching emergency visibility:", err);
+      }
+    }
+    getEmergencyVisibility();
+  }, []);
+
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[999] transition-all duration-300">
@@ -47,6 +63,7 @@ export default function Headers() {
           {/* Desktop Nav */}
           <nav className="hidden xl:flex items-center gap-8 z-50">
             {navItems.map((item) => {
+              if (item.href === "/emergencyDonation" && !emergencyVisibility) return null;
               const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
 
               return (
@@ -126,6 +143,7 @@ export default function Headers() {
           <div className="bg-[#00452E] border-t border-emerald-800 md:border md:rounded-2xl shadow-2xl p-6 space-y-6 animate-fade-in">
             <nav className="flex flex-col gap-4">
               {navItems.map((item) => {
+                if (item.href === "/emergencyDonation" && !emergencyVisibility) return null;
                 const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
 
                 return (

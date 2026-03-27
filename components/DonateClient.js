@@ -96,6 +96,7 @@ export default function DonatePage({ searchParams }) {
   const [donationFor, setDonationFor] = useState("self");
   const [dedicatedTo, setDedicatedTo] = useState("");
   const [message, setMessage] = useState("");
+  const [requestCertificate, setRequestCertificate] = useState(false);
   const minAmounts = {
     "One-Time": 50,
     Weekly: 20,
@@ -875,7 +876,7 @@ export default function DonatePage({ searchParams }) {
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="bg-[#0F172A] rounded-[1.5rem] sm:rounded-[2.5rem] px-6 py-5 sm:px-8 sm:py-6 lg:px-10 lg:py-8 text-white shadow-2xl space-y-4 sm:space-y-6"
+                    className="bg-[#0F172A] rounded-[1.2rem] sm:rounded-[2rem] px-6 py-4 sm:px-8 sm:py-5 lg:px-10 lg:py-6 text-white shadow-2xl space-y-3 sm:space-y-4"
                   >
                     <div className="space-y-1 text-center flex flex-col items-center">
                       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-600/20 text-emerald-400 font-medium text-xs border border-emerald-400/20">
@@ -889,11 +890,12 @@ export default function DonatePage({ searchParams }) {
                     <div className="space-y-3">
                       {[
                         { label: "Purpose", val: donationType },
+                        { label: "Frequency", val: isRecurring ? donationFrequency : "One-Time" },
                         { label: "Dedication", val: donationFor === "self" ? "For Myself" : dedicatedTo || "Family/Memory" },
-                        { label: "Impact", val: `₹${amountValue} ${isRecurring ? donationFrequency : ""}`, accent: true },
+                        { label: "Impact", val: `₹${amountValue}`, accent: true },
                         { label: "Project", val: selectedProject?.title || "—" },
                       ].map((item, idx) => (
-                        <div key={idx} className="flex justify-between items-center py-3 border-b border-white/5 last:border-0">
+                        <div key={idx} className="flex justify-between items-center py-2.5 border-b border-white/5 last:border-0">
                           <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">{item.label}</span>
                           <span className={`font-bold ${item.accent ? "text-emerald-400 text-lg sm:text-xl" : "text-white text-sm sm:text-base"}`}>
                             {item.val}
@@ -904,7 +906,7 @@ export default function DonatePage({ searchParams }) {
 
                     <button
                       onClick={handlePayment}
-                      className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold text-base sm:text-lg flex items-center justify-center gap-3 transition-all active:scale-95 group shadow-xl shadow-emerald-900/20"
+                      className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold text-base sm:text-lg flex items-center justify-center gap-3 transition-all active:scale-95 group shadow-xl shadow-emerald-900/20"
                     >
                       Complete Payment
                       <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

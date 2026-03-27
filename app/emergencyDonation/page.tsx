@@ -1,7 +1,8 @@
 "use client";
 import React from 'react';
 import { Playfair_Display } from "next/font/google";
-import { Heart, Activity, Image as ImageIcon, Info, Share2, AlertCircle } from "lucide-react";
+import { Heart, Activity, Image as ImageIcon, Info, Share2, AlertCircle, Play, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const playfair = Playfair_Display({
     subsets: ["latin"],
@@ -61,7 +62,7 @@ const EmergencyDonation = () => {
         gallery: data?.media || [
             { type: 'image', url: 'https://images.unsplash.com/photo-1593113565694-c6e09f5db184?q=80&w=600&auto=format&fit=crop', caption: 'Relief distribution center' },
             { type: 'image', url: 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?q=80&w=600&auto=format&fit=crop', caption: 'Medical camp setup' },
-            { type: 'video', url: 'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=1200&auto=format&fit=crop', caption: 'Ground report video overview' },
+            { type: 'video', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', caption: 'Ground report video overview' },
         ],
         updates: data?.liveUpdates?.map((u: any) => ({
             title: u.title,
@@ -217,21 +218,13 @@ const EmergencyDonation = () => {
                                 }
 
                                 return (
-                                    <div className="sm:col-span-2 bg-gray-200 rounded-2xl h-80 md:h-96 w-full overflow-hidden relative group flex flex-col items-center justify-center">
-                                        {isYouTube ? (
-                                            <iframe
-                                                className="w-full h-full object-cover"
-                                                src={embedUrl}
-                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                allowFullScreen
-                                            />
-                                        ) : (
-                                            <video
-                                                src={videoItem.url}
-                                                controls
-                                                className="w-full h-full object-cover bg-black"
-                                            />
-                                        )}
+                                    <div className="sm:col-span-2 bg-gray-200 rounded-3xl h-80 md:h-96 w-full overflow-hidden relative group">
+                                        <iframe
+                                            className="w-full h-full object-cover"
+                                            src={embedUrl}
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowFullScreen
+                                        />
                                         {videoItem.caption && (
                                             <div className="absolute inset-x-0 top-0 p-4 bg-gradient-to-b from-black/80 to-transparent pointer-events-none z-10">
                                                 <p className="text-white font-medium text-sm">{videoItem.caption}</p>
