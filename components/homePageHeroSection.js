@@ -40,7 +40,7 @@ export default function HomePageHeroSection({ hero }) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
 
-    const sliderImages = hero?.heroImages || [
+    const sliderImages = (hero?.carouselImages?.length > 0) ? hero.carouselImages : [
         "/donate.jpg",
         "https://res.cloudinary.com/doxoxzz02/image/upload/v1755268342/Zakath_Fund_zsrpnx.jpg",
         "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2070&auto=format&fit=crop",
