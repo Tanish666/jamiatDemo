@@ -1,11 +1,10 @@
 "use client";
 
-
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useScroll, useMotionValueEvent } from "framer-motion";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
-import { Users, Calendar } from "lucide-react";
+import { Users, Calendar, Search } from "lucide-react";
 import Image from "next/image";
 
 import ShareButton from "./ShareButton";
@@ -29,14 +28,6 @@ const formatCurrency = (amount) => {
   if (value < 1_000_000) return `₹${Math.floor(value / 1_000)}k`;
   if (value < 10_000_000) return `₹${Math.floor(value / 100_000)}L`;
   return `₹${Math.floor(value / 10_000_000)}Cr`;
-};
-
-const formatNumber = (num) => {
-  const value = Number(num) || 0;
-  if (value < 1_000) return value.toString();
-  if (value < 1_000_000) return Math.floor(value / 1_000) + "k";
-  if (value < 10_000_000) return Math.floor(value / 100_000) + "L";
-  return Math.floor(value / 10_000_000) + "Cr";
 };
 
 // Skeleton Loader
@@ -99,8 +90,6 @@ export default function ProjectCardsSection({
           { signal: controller.signal }
         );
 
-        console.log(`${process.env.NEXT_PUBLIC_API_URL}/projects?limit=${initialLimit}&page=${page}`)
-
         const projectsData = await projectsRes.json();
 
         const projectList = Array.isArray(projectsData?.projects)
@@ -109,23 +98,17 @@ export default function ProjectCardsSection({
 
         const perProjectSummaries = await Promise.all(
           projectList.map(async (p) => {
-            if (!p?._id) {
-              return { id: null, summary: null };
-            }
+            if (!p?._id) return { id: null, summary: null };
             try {
               const res = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/donations/summary/${p._id}`,
                 { signal: controller.signal }
               );
-              if (!res.ok) {
-                return { id: p._id, summary: null };
-              }
+              if (!res.ok) return { id: p._id, summary: null };
               const json = await res.json();
               return { id: p._id, summary: json?.data || null };
             } catch (err) {
-              if (err instanceof DOMException && err.name === "AbortError") {
-                throw err;
-              }
+              if (err instanceof DOMException && err.name === "AbortError") throw err;
               return { id: p._id, summary: null };
             }
           })
@@ -183,15 +166,14 @@ export default function ProjectCardsSection({
 
     fetchData();
     return () => controller.abort();
-  }, [page, initialLimit]);
+  }, [page, initialLimit, isMounted]);
 
   // Infinite scroll using framer-motion useScroll
   const { scrollYProgress } = useScroll();
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     if (!infiniteScroll || !hasMore || loading || loadingRef.current) return;
-    // When user has scrolled past 80% of the page, load more
-    if (latest > 0.5) {
+    if (latest > 0.2) {
       loadingRef.current = true;
       setPage((prev) => prev + 1);
     }
@@ -213,19 +195,19 @@ export default function ProjectCardsSection({
       const matchesCategory =
         categoryFilter === "all" ||
         (Array.isArray(project?.category) &&
-          project.category.includes(categoryFilter));
+          project.category.map(c => typeof c === 'string' ? c.toLowerCase() : "").includes(categoryFilter.toLowerCase()));
 
       let matchesDonationType = true;
       if (donationTypeFilter !== "all") {
         matchesDonationType = project?.donationOptions?.some((opt) => {
           if (!opt?.isEnabled) return false;
-          const type = opt.type?.toLowerCase();
+          const type = opt.type?.toLowerCase().trim();
+          const target = donationTypeFilter.toLowerCase();
           return (
-            (donationTypeFilter === "zakat" && type === "zakat") ||
-            (donationTypeFilter === "interest_earnings" &&
-              type === "interest earnings") ||
-            (donationTypeFilter === "sadqa" && type === "sadqa") ||
-            (donationTypeFilter === "general" && type === "general donation")
+            (target === "zakat" && type === "zakat") ||
+            (target === "interest_earnings" && (type === "interest earnings" || type === "interest" || type === "others" || type === "interest income")) ||
+            (target === "sadqa" && (type === "sadqa" || type === "sadaqah" || type === "saqa")) ||
+            (target === "general" && (type === "general donation" || type === "hadiya" || type === "general"))
           );
         });
       }
@@ -233,6 +215,15 @@ export default function ProjectCardsSection({
       return matchesSearch && matchesCategory && matchesDonationType;
     });
   }, [projects, searchTerm, categoryFilter, donationTypeFilter]);
+
+  // Auto-load more projects if the current page has 0 results after filtering 
+  // but we know there are more projects in the database.
+  useEffect(() => {
+    if (infiniteScroll && !loading && hasMore && filteredProjects.length === 0 && projects.length > 0) {
+      loadingRef.current = true;
+      setPage((prev) => prev + 1);
+    }
+  }, [filteredProjects.length, hasMore, loading, infiniteScroll, projects.length]);
 
   return (
     <section className="flex flex-col items-center w-full px-0 py-8 sm:px-12 text-slate-900">
@@ -248,51 +239,54 @@ export default function ProjectCardsSection({
         <>
           {/* Projects Grid */}
           <div className="grid w-full md:gap-8 gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredProjects.map((project) => (
-              <div
-                key={project?._id}
-                className="group overflow-hidden bg-white rounded-[2rem] shadow-sm hover:shadow-2xl transition-all duration-500 lg:hover:-translate-y-2 lg:hover:scale-[1.02] flex flex-col border border-slate-100"
-              >
-                {/* Image & Share */}
-                <div className="h-48 lg:h-56 relative cursor-pointer" onClick={() => setSelectedImage(project?.cardImage || project?.mainImage)}>
-                  <Image
-                    src={project?.cardImage || project?.mainImage}
-                    alt={project?.title || "Project"}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#06422d]/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <div className="absolute top-2 right-2">
-                    <ShareButton slug={project?.slug || ""} />
+            {filteredProjects.length > 0 ? (
+              filteredProjects.map((project) => (
+                <div
+                  key={project?._id}
+                  className="group overflow-hidden bg-white rounded-[2rem] shadow-sm hover:shadow-2xl transition-all duration-500 lg:hover:-translate-y-2 lg:hover:scale-[1.02] flex flex-col border border-slate-100"
+                >
+                  {/* Image & Share */}
+                  <div 
+                    className="h-48 lg:h-56 relative cursor-pointer" 
+                    onClick={() => setSelectedImage(project?.cardImage || project?.mainImage)}
+                  >
+                    <Image
+                      src={project?.cardImage || project?.mainImage}
+                      alt={project?.title || "Project"}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#06422d]/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="absolute top-2 right-2">
+                      <ShareButton slug={project?.slug || ""} />
+                    </div>
                   </div>
-                </div>
 
-                {/* Title & Description */}
-                <div className="p-6 pb-2">
-                  <h3 className={`${playfair.className} text-xl text-[#06422d] font-bold h-[56px] line-clamp-2 mb-3 tracking-tight`}>
-                    {project?.title || "Untitled Project"}
-                  </h3>
-                  <div className="h-[72px] mb-3 overflow-hidden">
-                    <p className="text-sm text-gray-600 inline leading-relaxed">
-                      {(() => {
-                        const text = stripHtml(project?.description) || "No description available";
-                        return text.length > 85 ? text.substring(0, 85).trim() + "..." : text;
-                      })()}
-                    </p>
-                    <Link
-                      href={`/projects/${project?.slug || ""}`}
-                      className="text-emerald-700 hover:text-emerald-800 text-sm font-semibold hover:underline ml-1 inline whitespace-nowrap"
-                    >
-                      View more
-                    </Link>
+                  {/* Title & Description */}
+                  <div className="p-6 pb-2">
+                    <h3 className={`${playfair.className} text-xl text-[#06422d] font-bold h-[56px] line-clamp-2 mb-3 tracking-tight`}>
+                      {project?.title || "Untitled Project"}
+                    </h3>
+                    <div className="h-[72px] mb-3 overflow-hidden">
+                      <p className="text-sm text-gray-600 inline leading-relaxed">
+                        {(() => {
+                          const text = stripHtml(project?.description) || "No description available";
+                          return text.length > 85 ? text.substring(0, 85).trim() + "..." : text;
+                        })()}
+                      </p>
+                      <Link
+                        href={`/projects/${project?.slug || ""}`}
+                        className="text-emerald-700 hover:text-emerald-800 text-sm font-semibold hover:underline ml-1 inline whitespace-nowrap"
+                      >
+                        View more
+                      </Link>
+                    </div>
                   </div>
-                </div>
 
-                {/* Stats & Buttons */}
-                <div className="p-6 pt-0 flex flex-col flex-grow space-y-4">
-                  {project?.totalRequired > 0 ? (
-                    <>
+                  {/* Stats & Buttons */}
+                  <div className="p-6 pt-0 flex flex-col flex-grow space-y-4">
+                    {project?.totalRequired > 0 ? (
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-600">Progress</span>
@@ -315,62 +309,68 @@ export default function ProjectCardsSection({
                           </span>
                         </div>
                       </div>
-                    </>
-                  ) : (
-                    <div className="flex justify-between bg-white p-4">
-                      <div className="flex flex-col items-center font-bold text-center">
-                        <span className="text-xs uppercase text-gray-500">
-                          Total Collected
-                        </span>
-                        <span className="text-lg text-[#06422d]">
-                          {formatCurrency(
-                            project?.donationSummary?.totalCollected ?? 0
-                          )}
-                        </span>
+                    ) : (
+                      <div className="flex justify-between bg-white p-4">
+                        <div className="flex flex-col items-center font-bold text-center">
+                          <span className="text-xs uppercase text-gray-500">
+                            Total Collected
+                          </span>
+                          <span className="text-lg text-[#06422d]">
+                            {formatCurrency(
+                              project?.donationSummary?.totalCollected ?? 0
+                            )}
+                          </span>
+                        </div>
+                        <div className="flex flex-col items-center font-bold text-center">
+                          <span className="text-xs uppercase text-gray-500">
+                            Total Donors
+                          </span>
+                          <span className="text-lg text-gray-800">
+                            {project?.donationSummary?.totalDonors ?? 0}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex flex-col items-center font-bold text-center">
-                        <span className="text-xs uppercase text-gray-500">
-                          Total Donors
-                        </span>
-                        <span className="text-lg text-gray-800">
-                          {project?.donationSummary?.totalDonors ?? 0}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-1.5 mt-auto">
-                    {project?.status !== "Completed" && (
-                      <Link
-                        href={
-                          !isSignedIn
-                            ? "/login"
-                            : `/donate/${project?.slug || ""}`
-                        }
-                        className="w-full sm:flex-1 text-center bg-[#06422d] text-white py-[0.70rem] px-1 rounded-xl hover:bg-emerald-800 text-sm font-bold transition-all duration-300 active:scale-[0.98] shadow-lg shadow-emerald-900/10 whitespace-nowrap"
-                      >
-                        Donate Now
-                      </Link>
                     )}
-                    <Link
-                      href={`/projects/${project?.slug || ""}`}
-                      className="w-full sm:flex-1 text-center border-2 border-emerald-900 text-emerald-900 py-[0.60rem] px-1 rounded-xl hover:bg-emerald-50 text-sm font-bold transition-all duration-300 active:scale-[0.98] whitespace-nowrap"
-                    >
-                      View Details
-                    </Link>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-1.5 mt-auto">
+                      {project?.status !== "Completed" && (
+                        <Link
+                          href={!isSignedIn ? "/login" : `/donate/${project?.slug || ""}`}
+                          className="w-full sm:flex-1 text-center bg-[#06422d] text-white py-[0.70rem] px-1 rounded-xl hover:bg-emerald-800 text-sm font-bold transition-all duration-300 active:scale-[0.98] shadow-lg shadow-emerald-900/10 whitespace-nowrap"
+                        >
+                          Donate Now
+                        </Link>
+                      )}
+                      <Link
+                        href={`/projects/${project?.slug || ""}`}
+                        className="w-full sm:flex-1 text-center border-2 border-emerald-900 text-emerald-900 py-[0.60rem] px-1 rounded-xl hover:bg-emerald-50 text-sm font-bold transition-all duration-300 active:scale-[0.98] whitespace-nowrap"
+                      >
+                        View Details
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              !loading && (
+                <div className="col-span-full py-20 text-center">
+                  <div className="inline-flex p-4 rounded-full bg-slate-50 mb-4">
+                    <Search className="h-8 w-8 text-slate-300" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-800 mb-2">No projects found</h3>
+                  <p className="text-slate-500">
+                    We couldn't find any projects matching your current filters.
+                  </p>
+                </div>
+              )
+            )}
           </div>
 
           {/* Infinite scroll loader */}
           {infiniteScroll && hasMore && (
-            <div
-              className="mt-6 grid w-full md:gap-8 gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-            >
-              {Array.from({ length: infiniteScroll ? initialLimit : 4 }).map((_, i) => (
+            <div className="mt-6 grid w-full md:gap-8 gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: initialLimit }).map((_, i) => (
                 <ProjectCardSkeleton key={`skeleton-${i}`} />
               ))}
             </div>
@@ -417,4 +417,3 @@ export default function ProjectCardsSection({
     </section>
   );
 }
-

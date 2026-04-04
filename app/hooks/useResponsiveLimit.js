@@ -7,10 +7,10 @@ export default function useResponsiveLimit() {
     function updateLimit() {
       const width = window.innerWidth;
 
-      if (width < 480) setLimit(1);           // small mobile
-      else if (width <= 1024) setLimit(2);    // mobiles, tablets and small laptops (13")
-      else if (width <= 1440) setLimit(3);    // large desktops and laptops (15")
-      else setLimit(6);                       // very large screens (4k)
+      if (width < 480) setLimit(3);           // small mobile
+      else if (width <= 1024) setLimit(6);    // mobiles, tablets and small laptops (13")
+      else if (width <= 1440) setLimit(9);    // large desktops and laptops (15")
+      else setLimit(12);                      // very large screens (4k)
     }
 
     updateLimit();

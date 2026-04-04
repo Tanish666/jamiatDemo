@@ -32,13 +32,17 @@ const COLLAPSED_HEIGHT = 120; // px – roughly 4-5 lines of text
 const StoryItem = ({ item, icon, idx, isExpanded, onToggle }) => {
   const isEmerald = idx % 2 === 0;
   const contentRef = useRef(null);
-  const [needsToggle, setNeedsToggle] = useState(false);
+  const [needsToggle, setNeedsToggle] = useState(item?.content?.length > 250);
 
   useEffect(() => {
     if (contentRef.current) {
-      setNeedsToggle(contentRef.current.scrollHeight > COLLAPSED_HEIGHT);
+      const shouldToggle = contentRef.current.scrollHeight > COLLAPSED_HEIGHT;
+      // Only update if different to avoid unnecessary re-renders
+      if (shouldToggle !== needsToggle) {
+        setNeedsToggle(shouldToggle);
+      }
     }
-  }, [item?.content]);
+  }, [item?.content, needsToggle]);
 
   return (
     <div className="flex items-start gap-4 lg:gap-6">
@@ -79,17 +83,15 @@ const StoryItem = ({ item, icon, idx, isExpanded, onToggle }) => {
         {needsToggle && (
           <button
             onClick={onToggle}
-            className={`inline-flex items-center gap-1.5 text-sm font-semibold transition-colors duration-200 cursor-pointer ${
-              isEmerald
+            className={`inline-flex items-center gap-1.5 text-sm font-semibold transition-colors duration-200 cursor-pointer ${isEmerald
                 ? "text-emerald-600 hover:text-emerald-700"
                 : "text-amber-600 hover:text-amber-700"
-            }`}
+              }`}
           >
             {isExpanded ? "Show Less" : "Read More"}
             <ChevronDown
-              className={`w-4 h-4 transition-transform duration-300 ${
-                isExpanded ? "rotate-180" : ""
-              }`}
+              className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""
+                }`}
             />
           </button>
         )}

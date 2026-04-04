@@ -13,7 +13,7 @@ import {
   PieChart,
   Gem,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { StorySection } from "./StorySection";
 
 const JOURNEY_ICONS = [<History className="w-6 h-6" key="h1" />, <Heart className="w-6 h-6" key="h2" />, <Users className="w-6 h-6" key="u1" />, <Gem className="w-6 h-6" key="g1" />];
@@ -342,17 +342,47 @@ const AboutClient = () => {
               ))}
             </div>
 
-            <div className="mt-6 lg:mt-12">
+            <motion.div
+              layout
+              className="mt-6 lg:mt-12 overflow-hidden min-h-[300px]"
+              transition={{ layout: { duration: 0.4, ease: "easeInOut" } }}
+            >
+              <AnimatePresence mode="wait" initial={false}>
                 {activeTab === "journey" && (
-                  <StorySection items={story?.journey} icons={JOURNEY_ICONS} />
+                  <motion.div
+                    key="journey"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                  >
+                    <StorySection items={story?.journey} icons={JOURNEY_ICONS} />
+                  </motion.div>
                 )}
                 {activeTab === "impact" && (
-                  <StorySection items={story?.impact} icons={IMPACT_ICONS} />
+                  <motion.div
+                    key="impact"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                  >
+                    <StorySection items={story?.impact} icons={IMPACT_ICONS} />
+                  </motion.div>
                 )}
                 {activeTab === "future" && (
-                  <StorySection items={story?.future} icons={FUTURE_ICONS} />
+                  <motion.div
+                    key="future"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                  >
+                    <StorySection items={story?.future} icons={FUTURE_ICONS} />
+                  </motion.div>
                 )}
-            </div>
+              </AnimatePresence>
+            </motion.div>
           </div>
         </div>
       </section>
