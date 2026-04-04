@@ -9,7 +9,6 @@ import {
   TrendingUp,
   History,
   Briefcase,
-  ChevronRight,
   Download,
   PieChart,
   Gem,
@@ -96,9 +95,6 @@ const AboutClient = () => {
   const [financial, setFinancial] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("journey");
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isOverflowing, setIsOverflowing] = useState(false);
-  const contentRef = React.useRef(null);
 
   useEffect(() => {
     if (story) {
@@ -107,21 +103,6 @@ const AboutClient = () => {
       else if (story.future?.length > 0) setActiveTab("future");
     }
   }, [story]);
-
-  useEffect(() => {
-    setIsExpanded(false);
-  }, [activeTab]);
-
-  useEffect(() => {
-    const checkOverflow = () => {
-      if (contentRef.current) {
-        setIsOverflowing(contentRef.current.scrollHeight > 400);
-      }
-    };
-    checkOverflow();
-    const timeoutId = setTimeout(checkOverflow, 100);
-    return () => clearTimeout(timeoutId);
-  }, [activeTab, story]);
 
   const availableTabs = React.useMemo(() => [
     { label: "Our Journey", value: "journey", data: story?.journey },
@@ -361,18 +342,7 @@ const AboutClient = () => {
               ))}
             </div>
 
-            <div className="mt-6 lg:mt-12 space-y-6">
-              <div
-                ref={contentRef}
-                className={`relative transition-all duration-500 ${isExpanded
-                  ? "max-h-[600px] overflow-y-auto pr-2"
-                  : "max-h-[400px] overflow-hidden"
-                  }`}
-                style={{
-                  scrollbarWidth: 'thin',
-                  scrollbarColor: '#10B981 transparent'
-                }}
-              >
+            <div className="mt-6 lg:mt-12">
                 {activeTab === "journey" && (
                   <StorySection items={story?.journey} icons={JOURNEY_ICONS} />
                 )}
@@ -382,28 +352,6 @@ const AboutClient = () => {
                 {activeTab === "future" && (
                   <StorySection items={story?.future} icons={FUTURE_ICONS} />
                 )}
-
-                {/* Gradient overlay when collapsed */}
-                {!isExpanded && isOverflowing && (
-                  <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white to-transparent pointer-events-none" />
-                )}
-              </div>
-
-              {/* Toggle Button */}
-              {isOverflowing && (
-                <div className="flex justify-center mt-4 pt-2">
-                  <button
-                    onClick={() => setIsExpanded(!isExpanded)}
-                    className="px-6 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-semibold rounded-full transition-colors text-sm flex items-center gap-2"
-                  >
-                    {isExpanded ? (
-                      <>Show Less <ChevronRight className="w-4 h-4 -rotate-90 transition-transform" /></>
-                    ) : (
-                      <>Read More <ChevronRight className="w-4 h-4 rotate-90 transition-transform" /></>
-                    )}
-                  </button>
-                </div>
-              )}
             </div>
           </div>
         </div>
