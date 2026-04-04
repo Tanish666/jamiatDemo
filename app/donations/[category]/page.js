@@ -524,7 +524,7 @@ export default function DonatePage() {
                     : "border-gray-300"
                     }`}
                 >
-                  ₹{amount.toLocaleString()}
+                  ₹{amount.toLocaleString('en-IN')}
                 </button>
               ))}
             </div>

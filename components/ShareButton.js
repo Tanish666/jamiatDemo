@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { Share2, Check, Copy } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 
-export default function ShareButton({ slug, title }) {
+export default function ShareButton({ slug, title, type = "projects", align = "right" }) {
   const [copied, setCopied] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -22,7 +22,10 @@ export default function ShareButton({ slug, title }) {
 
   const getUrl = () => {
     const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
-    return `${baseUrl}/projects/${slug}`;
+    if (slug) {
+      return `${baseUrl}/${type}/${slug}`;
+    }
+    return typeof window !== "undefined" ? window.location.href : "";
   };
 
   const handleCopy = async () => {
@@ -40,26 +43,31 @@ export default function ShareButton({ slug, title }) {
 
   const handleWhatsAppShare = () => {
     const url = getUrl();
-    const text = title ? `Check out this project: ${title}\n\n${url}` : `Check out this project!\n\n${url}`;
+    const prefix = type === "blogs" ? "blog post" : "project";
+    const text = title ? `Check out this ${prefix}: ${title}\n\n${url}` : `Check out this ${prefix}!\n\n${url}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
     setIsOpen(false);
   };
+
+  const displayType = type === "blogs" ? "Blog Post" : "Project";
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`p-2.5 rounded-full transition-all duration-300 flex items-center justify-center ${isOpen ? "bg-white text-emerald-600 shadow-lg scale-105" : "bg-white/90 text-gray-700 shadow-md hover:bg-white hover:text-emerald-600"
+        className={`p-2.5 rounded-full transition-all duration-300 flex items-center justify-center ${isOpen ? "bg-white text-emerald-600 shadow-lg scale-105" : "bg-gray-50 text-gray-700 shadow-sm hover:bg-white hover:text-emerald-600 border border-gray-100"
           }`}
-        aria-label="Share project"
+        aria-label={`Share ${displayType}`}
       >
         <Share2 className="w-4 h-4 transition-all duration-300" />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-3 w-60 bg-white/95 backdrop-blur-xl rounded-[1.5rem] shadow-[0_20px_40px_rgb(0,0,0,0.15)] border border-white p-2 z-50 animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-300 origin-top-right">
+        <div className={`absolute mt-3 w-60 bg-white/95 backdrop-blur-xl rounded-[1.5rem] shadow-[0_20px_40px_rgb(0,0,0,0.15)] border border-white p-2 z-50 animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-300 ${
+          align === "left" ? "left-0 origin-top-left" : "right-0 origin-top-right"
+        }`}>
           <div className="px-3 py-2.5 border-b border-gray-100/60 mb-1">
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-1">Share Project</span>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-1">Share {displayType}</span>
           </div>
 
           <button

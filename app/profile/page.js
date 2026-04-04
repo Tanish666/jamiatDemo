@@ -417,7 +417,7 @@ export default function ProfilePage() {
 
                 <div className="grid grid-cols-1 gap-8">
                   <div className="space-y-1">
-                    <p className="text-5xl font-bold tracking-tight">₹{formData.totalDonated?.toLocaleString() || 0}</p>
+                    <p className="text-5xl font-bold tracking-tight">₹{formData.totalDonated?.toLocaleString('en-IN') || 0}</p>
                     <p className="text-xs font-medium text-emerald-200 uppercase tracking-wider">TOTAL DONATED</p>
                   </div>
                   <div className="grid grid-cols-2 gap-8 pt-6 border-t border-white/10">
@@ -477,7 +477,7 @@ export default function ProfilePage() {
                               {project.title}
                             </h4>
                             <p className="text-xs text-gray-400 font-medium">
-                              ₹{project.amount?.toLocaleString() || 0} • {project.donationsCount || 0} donation{project.donationsCount !== 1 ? 's' : ''}
+                              ₹{project.amount?.toLocaleString('en-IN') || 0} • {project.donationsCount || 0} donation{project.donationsCount !== 1 ? 's' : ''}
                             </p>
                           </div>
                         </div>

@@ -292,7 +292,7 @@ const EmergencyDonation = () => {
                                         )}
                                         <h3 className={`${playfair.className} text-2xl font-bold text-gray-900 mb-2 leading-tight`}>{project.title}</h3>
                                         {project.beneficiaries && (
-                                            <p className="text-gray-500 text-sm font-medium">{project.beneficiaries.toLocaleString()} Beneficiaries</p>
+                                            <p className="text-gray-500 text-sm font-medium">{project.beneficiaries.toLocaleString('en-IN')} Beneficiaries</p>
                                         )}
                                     </div>
 

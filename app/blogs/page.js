@@ -90,221 +90,148 @@ export default function BlogsPage() {
       </section>
 
       {/* 🟢 Main Content Area */}
-      <section className="max-w-7xl mx-auto px-4 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12">
-
-        {/* 📝 Left Column: Blog Posts */}
-        <div className="lg:col-span-8">
-          {loading ? (
-            <div className="grid gap-8 sm:grid-cols-2">
-              {[1, 2, 3, 4].map((n) => (
-                <div key={n} className="animate-pulse bg-gray-100 h-96 rounded-2xl"></div>
-              ))}
-            </div>
-          ) : filteredBlogs.length === 0 ? (
-            <p className="text-center text-gray-500 py-20">No blogs found matching your criteria.</p>
-          ) : (
-            <>
-              <div className="grid gap-8 sm:grid-cols-2">
-                {currentBlogs.slice(0, 4).map((blog, index) => (
-                  <motion.div
-                    key={blog._id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="group bg-white rounded-2xl overflow-hidden border border-gray-100 flex flex-col hover:shadow-xl transition-all duration-300"
-                  >
-                    {/* Image Container */}
-                    <div className="relative h-60 overflow-hidden">
-                      <Image
-                        src={blog.imageUrl || "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=600&auto=format&fit=crop"}
-                        alt={blog.title}
-                        fill
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      {blog.category && (
-                        <div className="absolute top-4 left-4 bg-[#10B981] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                          {blog.category}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-6 flex flex-col flex-1">
-                      <div className="flex items-center gap-4 text-gray-400 text-xs mb-3 font-medium">
-                        <span className="flex items-center gap-1">
-                          <Calendar size={14} className="text-gray-300" />
-                          {new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock size={14} className="text-gray-300" />
-                          5 min read
-                        </span>
-                      </div>
-
-                      <h2 className="text-xl font-bold text-[#1F2937] font-serif mb-3 leading-tight group-hover:text-[#10B981] transition-colors">
-                        <Link href={`/blogs/${blog._id}`}>{blog.title}</Link>
-                      </h2>
-
-                      <p className="text-gray-500 text-sm line-clamp-2 mb-6 leading-relaxed">
-                        {blog.excerpt || "Updates on our projects, success stories from the community, and insights into Islamic philanthropy."}
-                      </p>
-
-                      <div className="mt-auto">
-                        <Link
-                          href={`/blogs/${blog._id}`}
-                          className="inline-flex items-center gap-1 text-[#10B981] text-xs font-bold uppercase tracking-widest hover:gap-2 transition-all"
-                        >
-                          Read More <ArrowRight size={14} />
-                        </Link>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* 🏆 Featured / Wide Post (as seen in image) */}
-              {currentBlogs.length >= 5 && (
+      <section className="max-w-5xl mx-auto px-4 lg:px-8">
+        {loading ? (
+          <div className="grid gap-8 sm:grid-cols-2">
+            {[1, 2, 3, 4].map((n) => (
+              <div key={n} className="animate-pulse bg-gray-100 h-96 rounded-2xl"></div>
+            ))}
+          </div>
+        ) : filteredBlogs.length === 0 ? (
+          <p className="text-center text-gray-500 py-20">No blogs found.</p>
+        ) : (
+          <>
+            <div className="flex flex-wrap justify-center gap-8">
+              {currentBlogs.slice(0, 4).map((blog, index) => (
                 <motion.div
+                  key={blog._id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="mt-12 group bg-white rounded-2xl overflow-hidden border border-gray-100 grid md:grid-cols-5 hover:shadow-xl transition-all duration-300"
+                  transition={{ delay: index * 0.1 }}
+                  className="group bg-white rounded-2xl overflow-hidden border border-gray-100 flex flex-col hover:shadow-xl transition-all duration-300 w-full sm:w-[calc(50%-1rem)] max-w-[450px]"
                 >
-                  <div className="relative h-64 md:h-auto md:col-span-2 overflow-hidden">
+                  {/* Image Container */}
+                  <div className="relative h-60 overflow-hidden">
                     <Image
-                      src={currentBlogs[4].imageUrl || "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=800&auto=format&fit=crop"}
-                      alt={currentBlogs[4].title}
+                      src={blog.imageUrl || "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=600&auto=format&fit=crop"}
+                      alt={blog.title}
                       fill
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-4 left-4 bg-[#10B981] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                      {currentBlogs[4].category || "Volunteering"}
-                    </div>
                   </div>
-                  <div className="p-8 md:col-span-3 flex flex-col justify-center">
+
+                  {/* Content */}
+                  <div className="p-6 flex flex-col flex-1">
                     <div className="flex items-center gap-4 text-gray-400 text-xs mb-3 font-medium">
                       <span className="flex items-center gap-1">
                         <Calendar size={14} className="text-gray-300" />
-                        {new Date(currentBlogs[4].createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock size={14} className="text-gray-300" />
-                        8 min read
+                        5 min read
                       </span>
                     </div>
-                    <h2 className="text-2xl font-bold text-[#1F2937] font-serif mb-4 leading-tight group-hover:text-[#10B981] transition-colors">
-                      <Link href={`/blogs/${currentBlogs[4]._id}`}>{currentBlogs[4].title}</Link>
+
+                    <h2 className="text-xl font-bold text-[#1F2937] font-serif mb-3 leading-tight group-hover:text-[#10B981] transition-colors">
+                      <Link href={`/blogs/${blog._id}`}>{blog.title}</Link>
                     </h2>
-                    <p className="text-gray-500 text-sm mb-6 leading-relaxed">
-                      {currentBlogs[4].excerpt || "Our community efforts have reached new heights. Learn how our dedicated volunteers are making a tangible difference every single day."}
+
+                    <p className="text-gray-500 text-sm line-clamp-2 mb-6 leading-relaxed">
+                      {blog.excerpt || "Updates on our projects, success stories from the community, and insights into Islamic philanthropy."}
                     </p>
-                    <Link
-                      href={`/blogs/${currentBlogs[4]._id}`}
-                      className="inline-flex items-center gap-1 text-[#10B981] text-xs font-bold uppercase tracking-widest hover:gap-2 transition-all"
-                    >
-                      Read More <ArrowRight size={14} />
-                    </Link>
+
+                    <div className="mt-auto">
+                      <Link
+                        href={`/blogs/${blog._id}`}
+                        className="inline-flex items-center gap-1 text-[#10B981] text-xs font-bold uppercase tracking-widest hover:gap-2 transition-all"
+                      >
+                        Read More <ArrowRight size={14} />
+                      </Link>
+                    </div>
                   </div>
                 </motion.div>
-              )}
-
-              {/* 🔢 Pagination */}
-              {totalPages > 1 && (
-                <div className="mt-16 flex items-center justify-center gap-2">
-                  <button
-                    onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
-                    disabled={currentPage === 1}
-                    className="p-2 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    &lt;
-                  </button>
-
-                  {[...Array(totalPages)].map((_, i) => (
-                    <button
-                      key={i + 1}
-                      onClick={() => handlePageChange(i + 1)}
-                      className={`w-10 h-10 flex items-center justify-center rounded-lg font-bold transition-all ${currentPage === i + 1
-                          ? "bg-[#10B981] text-white shadow-md shadow-emerald-100"
-                          : "border border-gray-100 hover:bg-gray-50 text-gray-600"
-                        }`}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
-
-                  <button
-                    onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                    className="p-2 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    &gt;
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-
-        {/* 🔍 Right Column: Sidebar */}
-        <aside className="lg:col-span-4 space-y-12">
-
-          {/* Search */}
-          <div className="rounded-2xl border border-gray-100 p-5 shadow-md shadow-gray-100">
-            <div className="relative group rounded-xl">
-              <input
-                type="text"
-                placeholder="Search articles..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-full pl-10 pr-4 py-3 bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/10 focus:border-[#10B981] transition-all"
-              />
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#10B981] transition-colors" size={18} />
-            </div>
-          </div>
-
-          {/* Categories */}
-          <div>
-            <div className="flex items-center gap-2 mb-6">
-              <div className="h-6 w-1 bg-[#10B981] rounded-full"></div>
-              <h3 className="font-bold text-lg text-[#1F2937]">Categories</h3>
-            </div>
-            <div className="space-y-3">
-              <button
-                onClick={() => {
-                  setSelectedCategory("All");
-                  setCurrentPage(1);
-                }}
-                className={`flex items-center justify-between w-full py-2 text-sm transition-colors group ${selectedCategory === "All" ? "text-[#10B981] font-bold" : "text-gray-500 hover:text-[#10B981]"}`}
-              >
-                <span>All Categories</span>
-                <span className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors ${selectedCategory === "All" ? "bg-emerald-100 text-[#10B981]" : "bg-gray-50 text-gray-400 group-hover:bg-emerald-50 group-hover:text-[#10B981]"}`}>
-                  {blogs.length}
-                </span>
-              </button>
-              {categories.map((cat, idx) => (
-                <button
-                  key={cat._id || idx}
-                  onClick={() => {
-                    setSelectedCategory(cat.name);
-                    setCurrentPage(1);
-                  }}
-                  className={`flex items-center justify-between w-full py-2 text-sm transition-colors group ${selectedCategory === cat.name ? "text-[#10B981] font-bold" : "text-gray-500 hover:text-[#10B981]"}`}
-                >
-                  <span>{cat.name}</span>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors ${selectedCategory === cat.name ? "bg-emerald-100 text-[#10B981]" : "bg-gray-50 text-gray-400 group-hover:bg-emerald-50 group-hover:text-[#10B981]"}`}>
-                    {blogs.filter(b => b.category === cat.name).length}
-                  </span>
-                </button>
               ))}
             </div>
-          </div>
 
+            {/* Featured Post */}
+            {currentBlogs.length >= 5 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="mt-12 group bg-white rounded-2xl overflow-hidden border border-gray-100 grid md:grid-cols-5 hover:shadow-xl transition-all duration-300"
+              >
+                <div className="relative h-64 md:h-auto md:col-span-2 overflow-hidden">
+                  <Image
+                    src={currentBlogs[4].imageUrl || "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=800&auto=format&fit=crop"}
+                    alt={currentBlogs[4].title}
+                    fill
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-8 md:col-span-3 flex flex-col justify-center">
+                  <div className="flex items-center gap-4 text-gray-400 text-xs mb-3 font-medium">
+                    <span className="flex items-center gap-1">
+                      <Calendar size={14} className="text-gray-300" />
+                      {new Date(currentBlogs[4].createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock size={14} className="text-gray-300" />
+                      8 min read
+                    </span>
+                  </div>
+                  <h2 className="text-2xl font-bold text-[#1F2937] font-serif mb-4 leading-tight group-hover:text-[#10B981] transition-colors">
+                    <Link href={`/blogs/${currentBlogs[4]._id}`}>{currentBlogs[4].title}</Link>
+                  </h2>
+                  <p className="text-gray-500 text-sm mb-6 leading-relaxed">
+                    {currentBlogs[4].excerpt || "Our community efforts have reached new heights. Learn how our dedicated volunteers are making a tangible difference every single day."}
+                  </p>
+                  <Link
+                    href={`/blogs/${currentBlogs[4]._id}`}
+                    className="inline-flex items-center gap-1 text-[#10B981] text-xs font-bold uppercase tracking-widest hover:gap-2 transition-all"
+                  >
+                    Read More <ArrowRight size={14} />
+                  </Link>
+                </div>
+              </motion.div>
+            )}
 
-        </aside>
+            {/* 🔢 Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-16 flex items-center justify-center gap-2">
+                <button
+                  onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="p-2 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  &lt;
+                </button>
 
+                {[...Array(totalPages)].map((_, i) => (
+                  <button
+                    key={i + 1}
+                    onClick={() => handlePageChange(i + 1)}
+                    className={`w-10 h-10 flex items-center justify-center rounded-lg font-bold transition-all ${currentPage === i + 1
+                        ? "bg-[#10B981] text-white shadow-md shadow-emerald-100"
+                        : "border border-gray-100 hover:bg-gray-50 text-gray-600"
+                      }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+
+                <button
+                  onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="p-2 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  &gt;
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </section>
     </div>
   );

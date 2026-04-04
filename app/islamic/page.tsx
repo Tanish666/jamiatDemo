@@ -88,7 +88,7 @@ const Islamic = () => {
                             </div>
 
                             <a
-                                href={toolsData?.zakatCalculatorLink || toolsData?.zakatCalculator || toolsData?.zakatLink || "#"}
+                                href={toolsData?.zakatLink || toolsData?.zakatCalculatorLink || toolsData?.zakatCalculator || toolsData?.zakatLink || "#"}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="bg-white text-[#00452E] px-8 py-4 rounded-[16px] font-bold hover:bg-emerald-50 transition-all w-full active:scale-[0.98] shadow-sm text-[17px] text-center inline-block">
@@ -121,7 +121,7 @@ const Islamic = () => {
                             </div>
 
                             <a
-                                href={toolsData?.hijriCalendarLink || toolsData?.hijriCalendar || toolsData?.calendarLink || "#"}
+                                href={toolsData?.hijriLink || toolsData?.hijriCalendarLink || toolsData?.hijriCalendar || toolsData?.calendarLink || "#"}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="bg-white text-[#00452E] px-8 py-4 rounded-[16px] font-bold hover:bg-emerald-50 transition-all w-full active:scale-[0.98] shadow-sm text-[17px] text-center inline-block">
@@ -197,8 +197,8 @@ const Islamic = () => {
                         {/* QnA Section */}
                         <div className="bg-white rounded-[32px] md:rounded-[48px] p-6 md:p-8 lg:p-16 border border-gray-100 shadow-[0_15px_50px_-12px_rgba(0,0,0,0.08)] flex flex-col h-full hover:-translate-y-2 transition-transform duration-500">
                             <div className="flex items-center gap-6 mb-8">
-                                <div className="bg-emerald-50 w-20 h-20 rounded-[28px] shadow-sm flex items-center justify-center flex-shrink-0 border border-emerald-100">
-                                    <HelpCircle className="h-10 w-10 text-emerald-600" />
+                                <div className="bg-emerald-50 w-14 h-14 rounded-2xl shadow-sm flex items-center justify-center flex-shrink-0 border border-emerald-100">
+                                    <HelpCircle className="h-7 w-7 text-emerald-600" />
                                 </div>
                                 <div>
                                     <h3 className={`${playfair.className} text-3xl font-bold text-[#1a2e35]`}>
@@ -215,21 +215,21 @@ const Islamic = () => {
                                     { question: "How to perform Salatul Tasbeeh?", answer: "Salatul Tasbeeh is a special prayer that includes 300 repetitions of specific tasbeeh praises." },
                                     { question: "What is the ruling on fasting while traveling?", answer: "Fasting is excused for travelers who find it difficult, though it must be made up later." },
                                 ]).map((item: any, i: number) => (
-                                    <div 
-                                        key={item._id || i} 
+                                    <div
+                                        key={item._id || i}
                                         className={`flex flex-col gap-2 p-5 rounded-3xl transition-all duration-300 border border-gray-100 cursor-pointer group ${activeQaIndex === i ? 'bg-emerald-50 border-emerald-200' : 'bg-gray-50 hover:bg-emerald-50'}`}
                                         onClick={() => setActiveQaIndex(activeQaIndex === i ? null : i)}
                                     >
                                         <div className="flex items-center justify-between gap-4">
                                             <div className="flex items-center gap-4">
-                                                <HelpCircle className={`w-6 h-6 flex-shrink-0 transition-colors ${activeQaIndex === i ? 'text-emerald-600' : 'text-emerald-500'}`} />
+                                                <HelpCircle className={`w-5 h-5 flex-shrink-0 transition-colors ${activeQaIndex === i ? 'text-emerald-600' : 'text-emerald-500'}`} />
                                                 <span className={`font-medium transition-colors ${activeQaIndex === i ? 'text-emerald-800' : 'text-gray-700 group-hover:text-emerald-800'}`}>
                                                     {item.question}
                                                 </span>
                                             </div>
-                                            <ChevronDown className={`w-5 h-5 text-emerald-600 transition-transform duration-300 ${activeQaIndex === i ? 'rotate-180' : ''}`} />
+                                            <ChevronDown className={`w-4 h-4 text-emerald-600 transition-transform duration-300 ${activeQaIndex === i ? 'rotate-180' : ''}`} />
                                         </div>
-                                        
+
                                         <div className={`transition-all duration-300 ${activeQaIndex === i ? 'max-h-[300px] opacity-100 mt-2 overflow-y-auto' : 'max-h-0 opacity-0 overflow-hidden'}`} style={{ scrollbarWidth: 'thin', scrollbarColor: '#a7f3d0 transparent' }}>
                                             <p className="text-gray-600 leading-relaxed text-sm pl-10 pr-2">
                                                 {item.answer}
@@ -243,7 +243,7 @@ const Islamic = () => {
                                     href={knowledgeData?.button2Url || "/videos"}
                                     className="flex-1 border-2 border-emerald-600 text-emerald-600 px-6 py-4 rounded-full font-bold hover:bg-emerald-50 transition-all flex items-center justify-center gap-2"
                                 >
-                                    <Youtube className="w-5 h-5 text-red-500" /> {knowledgeData?.button2Text || "Watch Q&A"}
+                                    <Youtube className="w-4 h-4 text-red-500" /> {knowledgeData?.button2Text || "Watch Q&A"}
                                 </a>
                             </div>
                         </div>
@@ -251,8 +251,8 @@ const Islamic = () => {
                         {/* Recent Bayan Section */}
                         <div className="bg-white rounded-[32px] md:rounded-[48px] p-6 md:p-8 lg:p-16 border border-gray-100 shadow-[0_15px_50px_-12px_rgba(0,0,0,0.08)] flex flex-col h-full hover:-translate-y-2 transition-transform duration-500">
                             <div className="flex items-center gap-6 mb-8">
-                                <div className="bg-emerald-50 w-20 h-20 rounded-[28px] shadow-sm flex items-center justify-center flex-shrink-0 border border-emerald-100">
-                                    <Video className="h-10 w-10 text-emerald-600" />
+                                <div className="bg-emerald-50 w-14 h-14 rounded-2xl shadow-sm flex items-center justify-center flex-shrink-0 border border-emerald-100">
+                                    <Video className="h-7 w-7 text-emerald-600" />
                                 </div>
                                 <div>
                                     <h3 className={`${playfair.className} text-3xl font-bold text-[#1a2e35]`}>
@@ -295,9 +295,9 @@ const Islamic = () => {
                                                 href={knowledgeData?.videoUrl || "#"}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="w-16 h-16 lg:w-20 lg:h-20 bg-emerald-600/90 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-emerald-500 transition-colors shadow-2xl"
+                                                className="w-12 h-12 lg:w-16 lg:h-16 bg-emerald-600/90 rounded-full flex items-center justify-center backdrop-blur-md group-hover:bg-emerald-500 transition-colors shadow-2xl"
                                             >
-                                                <Play className="w-6 h-6 lg:w-8 lg:h-8 text-white ml-1 lg:ml-2" />
+                                                <Play className="w-5 h-5 lg:w-7 lg:h-7 text-white ml-1 lg:ml-1.5" />
                                             </a>
                                         </div>
                                     </div>

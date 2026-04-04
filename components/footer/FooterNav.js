@@ -1,5 +1,5 @@
 "use client";
-
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import FooterMobileNav from "./FooterMobileNav";
@@ -88,9 +88,9 @@ export default function FooterNav() {
   }
 
   return (
-    <footer className="bg-[#F1F5F9] border-t border-gray-100 font-sans">
-      <div className="max-w-8xl mx-auto px-6 py-16 md:px-12 xl:px-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.5fr_0.7fr_1.3fr_1.5fr] gap-12 lg:gap-x-12 xl:gap-x-16">
+    <footer className="bg-[#F1F5F9] border-t border-gray-100 font-sans pb-16 md:pb-0">
+      <div className="max-w-8xl mx-auto px-6 py-10 md:py-16 md:px-12 xl:px-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.5fr_0.7fr_1.3fr_1.5fr] gap-8 md:gap-12 lg:gap-x-12 xl:gap-x-16">
           {/* Logo & Description */}
           <div className="flex flex-col gap-6">
             <Link href="/" className="flex items-center gap-3 group">
@@ -133,7 +133,7 @@ export default function FooterNav() {
 
           {/* Column 2: Quick Links */}
           <div>
-            <h3 className="text-slate-900 font-bold text-[13px] tracking-[0.1em] uppercase mb-8">
+            <h3 className="text-slate-900 font-bold text-[13px] tracking-[0.1em] uppercase mb-6 md:mb-8">
               Quick Links
             </h3>
             <ul className="space-y-4">
@@ -152,7 +152,7 @@ export default function FooterNav() {
 
           {/* Column 3: Contact Us */}
           <div>
-            <h3 className="text-slate-900 font-bold text-[13px] tracking-[0.1em] uppercase mb-8">
+            <h3 className="text-slate-900 font-bold text-[13px] tracking-[0.1em] uppercase mb-6 md:mb-8">
               Contact Us
             </h3>
             <ul className="space-y-4">
@@ -185,7 +185,7 @@ export default function FooterNav() {
 
           {/* Column 4: Stay Connected */}
           <div>
-            <h3 className="text-slate-900 font-bold text-[13px] tracking-[0.1em] uppercase mb-8">
+            <h3 className="text-slate-900 font-bold text-[13px] tracking-[0.1em] uppercase mb-6 md:mb-8">
               Stay Connected
             </h3>
             <div className="space-y-5">
@@ -204,11 +204,11 @@ export default function FooterNav() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-20 pt-10 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-8">
+        <div className="mt-10 md:mt-20 pt-8 md:pt-10 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6 md:gap-8">
           <p className="text-slate-400 text-[13px] font-medium">
             {footerData?.copyrightText || `© ${new Date().getFullYear()} Jamiat Ulama-i-Hind. All rights reserved.`}
           </p>
-          <div className="flex gap-10">
+          <div className="flex flex-wrap justify-center gap-6 md:gap-10">
             {footerData?.termsLinks?.map((link, idx) => (
               <Link
                 key={idx}

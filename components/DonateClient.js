@@ -54,11 +54,24 @@ export default function DonatePage({ searchParams }) {
   const [currentStep, setCurrentStep] = useState(1);
   const scrollRef = useRef(null);
 
+  const stepTitleRef = useRef(null);
+
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTo({ top: 0, behavior: "smooth" });
+      if (window.innerWidth < 1024) {
+        // On mobile, scroll to the top of the donation section (considering Hero is above it)
+        scrollRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        // On desktop, only scroll the internal container if it's scrollable
+        scrollRef.current.scrollTo({ top: 0, behavior: "smooth" });
+      }
     }
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    
+    // Focus the step title for accessibility when step changes
+    const timer = setTimeout(() => {
+      stepTitleRef.current?.focus();
+    }, 300);
+    return () => clearTimeout(timer);
   }, [currentStep]);
   const quickAmounts = [1000, 2500, 5000, 10000, 15000, 25000];
   const amountValue = customAmount === "" ? 0 : Number(customAmount);
@@ -490,7 +503,7 @@ export default function DonatePage({ searchParams }) {
       {/* Donation Section */}
       <div
         ref={scrollRef}
-        className="w-full lg:w-7/12 flex flex-col pt-8 lg:pt-32 pb-16 overflow-y-auto bg-slate-50/50"
+        className="w-full lg:w-7/12 flex flex-col pt-8 lg:pt-32 pb-16 overflow-y-auto bg-slate-50/50 scroll-mt-24"
       >
 
         <AnimatePresence mode="wait">
@@ -517,7 +530,13 @@ export default function DonatePage({ searchParams }) {
                           <Heart className="w-4 h-4" />
                           <span>Target Project</span>
                         </div>
-                        <h2 className="text-2xl lg:text-3xl font-bold text-slate-900 text-center">Select Project</h2>
+                        <h2 
+                          ref={stepTitleRef}
+                          tabIndex={-1}
+                          className="text-2xl lg:text-3xl font-bold text-slate-900 text-center focus:outline-none"
+                        >
+                          Select Project
+                        </h2>
                         <p className="text-slate-500 text-center">Where should your donation go?</p>
                       </div>
                       <div className="relative group">
@@ -608,10 +627,10 @@ export default function DonatePage({ searchParams }) {
                   </motion.div>
                 </section>
 
-                <footer className="max-w-2xl mx-auto px-5 lg:px-8 flex justify-center lg:justify-end">
+                  <footer className="max-w-2xl mx-auto px-5 lg:px-8 flex justify-center lg:justify-end">
                   <button
                     onClick={() => setCurrentStep(2)}
-                    className="px-8 py-4 bg-emerald-600 text-white rounded-2xl font-bold flex items-center gap-2 hover:bg-emerald-700 transition-all active:scale-95 shadow-xl shadow-emerald-900/10"
+                    className="px-8 py-4 bg-emerald-600 text-white rounded-2xl font-bold flex items-center gap-2 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all active:scale-95 shadow-xl shadow-emerald-900/10"
                   >
                     Next Step: Donation Type
                     <ArrowRight className="w-5 h-5" />
@@ -643,14 +662,20 @@ export default function DonatePage({ searchParams }) {
                         <Gift className="w-4 h-4" />
                         <span>Intention</span>
                       </div>
-                      <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 text-center">Donation Type</h2>
+                      <h2 
+                        ref={stepTitleRef}
+                        tabIndex={-1}
+                        className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 text-center focus:outline-none"
+                      >
+                        Donation Type
+                      </h2>
                       <p className="text-slate-500 text-center">Select your contribution category.</p>
                     </div>
                     <div className="grid gap-3">
                       {donationTypes.map((opt) => (
                         <label
                           key={opt.type}
-                          className={`relative flex items-center p-4 rounded-xl border-2 transition-all cursor-pointer ${donationType === opt.type
+                          className={`relative flex items-center p-4 rounded-xl border-2 transition-all cursor-pointer has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-emerald-500 ${donationType === opt.type
                             ? "border-emerald-500 bg-emerald-50/50"
                             : "border-slate-100 bg-slate-50/30 hover:border-emerald-200"
                             }`}
@@ -682,13 +707,13 @@ export default function DonatePage({ searchParams }) {
                 <footer className="max-w-2xl mx-auto px-5 lg:px-8 flex flex-col-reverse lg:flex-row items-center justify-between gap-4 lg:gap-0">
                   <button
                     onClick={() => setCurrentStep(1)}
-                    className="text-slate-400 font-bold hover:text-slate-600 transition-colors"
+                    className="text-slate-400 font-bold hover:text-slate-600 focus:outline-none focus:text-slate-900 transition-colors"
                   >
                     Back to Details
                   </button>
                   <button
                     onClick={() => setCurrentStep(3)}
-                    className="px-8 py-4 bg-emerald-600 text-white rounded-2xl font-bold flex items-center gap-2 hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-900/10"
+                    className="px-8 py-4 bg-emerald-600 text-white rounded-2xl font-bold flex items-center gap-2 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all shadow-xl shadow-emerald-900/10"
                   >
                     Next Step: Amount
                     <ArrowRight className="w-5 h-5" />
@@ -720,7 +745,13 @@ export default function DonatePage({ searchParams }) {
                         <IndianRupee className="w-4 h-4" />
                         <span>Investment</span>
                       </div>
-                      <h2 className="text-2xl lg:text-3xl font-bold text-slate-900 text-center">Choose Amount</h2>
+                      <h2 
+                        ref={stepTitleRef}
+                        tabIndex={-1}
+                        className="text-2xl lg:text-3xl font-bold text-slate-900 text-center focus:outline-none"
+                      >
+                        Choose Amount
+                      </h2>
                       <p className="text-slate-500 text-center">How much would you like to contribute?</p>
                     </div>
 
@@ -729,7 +760,7 @@ export default function DonatePage({ searchParams }) {
                         <button
                           type="button"
                           onClick={() => setIsFrequencyOpen(!isFrequencyOpen)}
-                          className={`w-full bg-slate-50 border-2 border-slate-100 px-5 h-14 rounded-xl focus:outline-none focus:border-emerald-500 focus:bg-white transition-all text-slate-900 font-bold flex items-center justify-between hover:bg-white/50 ${isFrequencyOpen ? 'border-emerald-500 ring-4 ring-emerald-500/10' : ''}`}
+                          className={`w-full bg-slate-50 border-2 border-slate-100 px-5 h-14 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 focus:bg-white transition-all text-slate-900 font-bold flex items-center justify-between hover:bg-white/50 ${isFrequencyOpen ? 'border-emerald-500 ring-4 ring-emerald-500/10' : ''}`}
                         >
                           <span className="text-base">{isRecurring ? donationFrequency : "One-Time"}</span>
                           <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform duration-200 ${isFrequencyOpen ? 'rotate-180 text-emerald-500' : ''}`} />
@@ -759,8 +790,8 @@ export default function DonatePage({ searchParams }) {
                                     setIsFrequencyOpen(false);
                                   }}
                                   className={`w-full px-5 py-3 text-left transition-colors font-bold text-sm ${(freq === "One-Time" && !isRecurring) || (isRecurring && donationFrequency === freq)
-                                      ? "bg-emerald-50 text-emerald-600"
-                                      : "text-slate-600 hover:bg-slate-50 hover:text-emerald-500"
+                                    ? "bg-emerald-50 text-emerald-600"
+                                    : "text-slate-600 hover:bg-slate-50 hover:text-emerald-500"
                                     }`}
                                 >
                                   {freq}
@@ -777,12 +808,12 @@ export default function DonatePage({ searchParams }) {
                         <button
                           key={amount}
                           onClick={() => setCustomAmount(amount)}
-                          className={`py-3 rounded-xl border-2 font-bold text-sm transition-all ${customAmount === amount
+                          className={`py-3 rounded-xl border-2 font-bold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 ${customAmount === amount
                             ? "border-emerald-500 bg-emerald-50 text-emerald-700"
                             : "border-slate-100 text-slate-400 hover:border-emerald-200"
                             }`}
                         >
-                          ₹{amount.toLocaleString()}
+                          ₹{amount.toLocaleString('en-IN')}
                         </button>
                       ))}
                     </div>
@@ -796,7 +827,7 @@ export default function DonatePage({ searchParams }) {
                         onChange={(e) => setCustomAmount(e.target.value === "" ? "" : Number(e.target.value))}
                         className="w-full h-14 pl-10 pr-4 rounded-xl border-2 border-slate-100 bg-slate-50/50 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all text-slate-900 font-bold text-lg"
                       />
-                      <div className="absolute text-red-500 text-xs mt-2 ml-2">(min: ₹{minAmount})</div>
+                      <div className="absolute text-red-500 text-xs mt-2 ml-2">(min: ₹{minAmount.toLocaleString('en-IN')})</div>
                     </div>
 
                     {amountValue > 2000 && (
@@ -831,7 +862,7 @@ export default function DonatePage({ searchParams }) {
                             { label: "Yearly", val: impact.Yearly },
                           ].map((item) => (
                             <div key={item.label} className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center space-y-1">
-                              <div className="text-emerald-600 font-bold text-lg">₹{item.val}</div>
+                              <div className="text-emerald-600 font-bold text-lg">₹{Number(item.val).toLocaleString('en-IN')}</div>
                               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.label}</div>
                             </div>
                           ))}
@@ -844,14 +875,14 @@ export default function DonatePage({ searchParams }) {
                 <footer className="max-w-2xl mx-auto px-5 lg:px-8 flex flex-col-reverse lg:flex-row items-center justify-between gap-4 lg:gap-0">
                   <button
                     onClick={() => setCurrentStep(2)}
-                    className="text-slate-400 font-bold hover:text-slate-600 transition-colors"
+                    className="text-slate-400 font-bold hover:text-slate-600 focus:outline-none focus:text-slate-900 transition-colors"
                   >
                     Back to Type
                   </button>
                   <button
                     onClick={() => {
                       if (!amountValue || amountValue < minAmount) {
-                        alert(`Please enter a valid donation amount (minimum ₹${minAmount}).`);
+                        alert(`Please enter a valid donation amount (minimum ₹${minAmount.toLocaleString('en-IN')}).`);
                         return;
                       }
                       if (amountValue > 2000) {
@@ -863,7 +894,7 @@ export default function DonatePage({ searchParams }) {
                       }
                       setCurrentStep(4);
                     }}
-                    className="px-8 py-4 bg-emerald-600 text-white rounded-2xl font-bold flex items-center gap-2 hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-900/10"
+                    className="px-8 py-4 bg-emerald-600 text-white rounded-2xl font-bold flex items-center gap-2 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all shadow-xl shadow-emerald-900/10"
                   >
                     Next Step: Review
                     <ArrowRight className="w-5 h-5" />
@@ -895,7 +926,13 @@ export default function DonatePage({ searchParams }) {
                         <ShieldCheck className="w-4 h-4" />
                         <span>Final Step</span>
                       </div>
-                      <h2 className="text-2xl sm:text-3xl font-bold text-center">Review & Pay</h2>
+                      <h2 
+                        ref={stepTitleRef}
+                        tabIndex={-1}
+                        className="text-2xl sm:text-3xl font-bold text-center focus:outline-none"
+                      >
+                        Review & Pay
+                      </h2>
                       <p className="text-slate-400 text-xs sm:text-sm text-center">Please confirm your donation details before proceeding.</p>
                     </div>
 
@@ -905,7 +942,7 @@ export default function DonatePage({ searchParams }) {
                         { label: "Frequency", val: isRecurring ? donationFrequency : "One-Time" },
                         { label: "Dedication", val: donationFor === "self" ? "For Myself" : dedicatedTo || "Family/Memory" },
                         ...(amountValue > 2000 ? [{ label: "PAN Card", val: panNumber }] : []),
-                        { label: "Impact", val: `₹${amountValue}`, accent: true },
+                        { label: "Impact", val: `₹${amountValue.toLocaleString('en-IN')}`, accent: true },
                         { label: "Project", val: selectedProject?.title || "—" },
                       ].map((item, idx) => (
                         <div key={idx} className="flex justify-between items-center py-2.5 border-b border-white/5 last:border-0">
@@ -919,7 +956,7 @@ export default function DonatePage({ searchParams }) {
 
                     <button
                       onClick={handlePayment}
-                      className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold text-base sm:text-lg flex items-center justify-center gap-3 transition-all active:scale-95 group shadow-xl shadow-emerald-900/20"
+                      className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold text-base sm:text-lg flex items-center justify-center gap-3 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 transition-all active:scale-95 group shadow-xl shadow-emerald-900/20"
                     >
                       Complete Payment
                       <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

@@ -1,25 +1,19 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
 import {
   Heart,
   Users,
-  GraduationCap,
   Globe,
   UserPlus,
   ChevronDown,
   ArrowRight,
-  Calendar,
+  Check,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const ICON_MAP = {
-  GraduationCap,
-  Heart,
-  Users,
-  Calendar,
-};
 
 export const VolunteerPage = () => {
   const [formData, setFormData] = useState({
@@ -28,36 +22,23 @@ export const VolunteerPage = () => {
     email: "",
     phone: "",
     interest: "Event Organization",
+    otherInterest: "",
     message: "",
     newsletter: false,
   });
   const [loading, setLoading] = useState(false);
-  const [opportunities, setOpportunities] = useState([]);
-  const [oppLoading, setOppLoading] = useState(true);
+  const [isInterestOpen, setIsInterestOpen] = useState(false);
+  const interestRef = useRef(null);
+
 
   useEffect(() => {
-    const controller = new AbortController();
-
-    async function fetchOpportunities() {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/volunteer-positions`,
-          { signal: controller.signal }
-        );
-        if (!res.ok) throw new Error("Failed to fetch opportunities");
-        const data = await res.json();
-        setOpportunities(Array.isArray(data) ? data : []);
-      } catch (err) {
-        if (err.name !== "AbortError") {
-          console.error(err);
-        }
-      } finally {
-        setOppLoading(false);
+    const handleClickOutside = (event) => {
+      if (interestRef.current && !interestRef.current.contains(event.target)) {
+        setIsInterestOpen(false);
       }
-    }
-
-    fetchOpportunities();
-    return () => controller.abort();
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleChange = useCallback((e) => {
@@ -81,11 +62,21 @@ export const VolunteerPage = () => {
         email: "",
         phone: "",
         interest: "Event Organization",
+        otherInterest: "",
         message: "",
         newsletter: false,
       });
     }, 1500);
   };
+
+  const interestOptions = [
+    "Event Organization",
+    "Teaching & Education",
+    "Community Outreach",
+    "Medical Support",
+    "Administrative Tasks",
+    "Others"
+  ];
 
   return (
     <div className="min-h-screen bg-[#FDFDFC] pt-32 pb-24 px-2 sm:px-6 lg:px-8">
@@ -171,23 +162,85 @@ export const VolunteerPage = () => {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">Skills & Expertise</label>
-                  <div className="relative">
-                    <select
-                      name="interest"
-                      value={formData.interest}
-                      onChange={handleChange}
-                      className="w-full appearance-none px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none text-gray-700"
-                    >
-                      <option>Event Organization</option>
-                      <option>Teaching & Education</option>
-                      <option>Community Outreach</option>
-                      <option>Medical Support</option>
-                      <option>Administrative Tasks</option>
-                    </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700">Skills & Expertise</label>
+                    <div className="relative" ref={interestRef}>
+                      <button
+                        type="button"
+                        onClick={() => setIsInterestOpen(!isInterestOpen)}
+                        className={`w-full flex items-center justify-between px-4 py-3.5 bg-gray-50 border-2 transition-all rounded-xl outline-none text-left ${
+                          isInterestOpen 
+                            ? "border-emerald-500 ring-4 ring-emerald-500/10 bg-white" 
+                            : "border-gray-100 hover:border-emerald-200"
+                        }`}
+                      >
+                        <span className={`font-medium ${formData.interest ? "text-gray-900" : "text-gray-400"}`}>
+                          {formData.interest}
+                        </span>
+                        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isInterestOpen ? "rotate-180 text-emerald-500" : ""}`} />
+                      </button>
+
+                      <AnimatePresence>
+                        {isInterestOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -10, scale: 0.98 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -10, scale: 0.98 }}
+                            className="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-2xl shadow-emerald-900/10 overflow-hidden py-1.5"
+                          >
+                            {interestOptions.map((opt) => (
+                              <button
+                                key={opt}
+                                type="button"
+                                onClick={() => {
+                                  setFormData(prev => ({ ...prev, interest: opt }));
+                                  setIsInterestOpen(false);
+                                }}
+                                className={`w-full px-4 py-3 text-left transition-all flex items-center justify-between group ${
+                                  formData.interest === opt 
+                                    ? "bg-emerald-50 text-emerald-700" 
+                                    : "text-gray-600 hover:bg-gray-50 hover:text-emerald-600"
+                                }`}
+                              >
+                                <span className={`text-sm font-semibold ${formData.interest === opt ? "translate-x-1" : ""} transition-transform`}>
+                                  {opt}
+                                </span>
+                                {formData.interest === opt && (
+                                  <Check className="w-4 h-4 text-emerald-600" />
+                                )}
+                              </button>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
+
+                  {/* Conditional specification for "Others" */}
+                  <AnimatePresence>
+                    {formData.interest === "Others" && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                        animate={{ opacity: 1, height: "auto", marginTop: 8 }}
+                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <label className="text-sm font-semibold text-gray-400 uppercase tracking-widest pl-1 mb-2 block">
+                          Please specify
+                        </label>
+                        <input
+                          type="text"
+                          name="otherInterest"
+                          placeholder="e.g. Graphic Design, Marketing..."
+                          value={formData.otherInterest}
+                          onChange={handleChange}
+                          required
+                          className="w-full px-4 py-3.5 bg-white border-2 border-emerald-100 rounded-xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none text-gray-900 font-medium placeholder:text-gray-300 shadow-sm"
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
                 <div className="space-y-2">
@@ -216,46 +269,6 @@ export const VolunteerPage = () => {
           {/* Right Column: Why Volunteer & Opportunities */}
           <div className="lg:col-span-5 space-y-10">
 
-            {/* Current Volunteer Opportunities */}
-            <div className="bg-[#ECFDF5] rounded-3xl p-5 sm:p-8 space-y-6">
-              <h2 className="text-2xl font-serif text-[#064E3B] font-bold">Current Opportunities</h2>
-
-              <div className="space-y-6">
-                {oppLoading ? (
-                  <div className="text-emerald-800/60 animate-pulse py-4">
-                    Loading opportunities...
-                  </div>
-                ) : opportunities.length === 0 ? (
-                  <div className="text-emerald-800/60 py-4">
-                    No active opportunities at the moment.
-                  </div>
-                ) : (
-                  opportunities.map((opportunity, idx) => {
-                    const Icon = ICON_MAP[opportunity.icon] || GraduationCap;
-                    return (
-                      <div key={opportunity._id || idx} className="flex gap-4 group">
-                        <div className="flex-shrink-0 w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                          <Icon className="w-6 h-6 text-emerald-600" />
-                        </div>
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-bold text-[#064E3B]">{opportunity.title}</h3>
-                          </div>
-                          <p className="text-emerald-800/70 text-sm leading-snug">
-                            {opportunity.description}
-                          </p>
-                          {opportunity.commitment && (
-                            <div className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-100/50 px-2 py-0.5 rounded">
-                              {opportunity.commitment}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-            </div>
 
             {/* Other Ways to Help Card */}
             <div className="bg-white rounded-3xl p-5 sm:p-8 border border-emerald-100 shadow-[0_8px_30px_rgb(16,185,129,0.05)] space-y-6">

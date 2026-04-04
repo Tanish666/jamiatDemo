@@ -77,11 +77,17 @@ export default function ProjectCardsSection({
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [isMounted, setIsMounted] = useState(false);
   const { isSignedIn } = useUser();
   const loadingRef = useRef(false);
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   // Fetch data
   useEffect(() => {
+    if (!isMounted) return;
     const controller = new AbortController();
 
     async function fetchData() {
@@ -230,7 +236,7 @@ export default function ProjectCardsSection({
 
   return (
     <section className="flex flex-col items-center w-full px-0 py-8 sm:px-12 text-slate-900">
-      {loading && page === 1 ? (
+      {!isMounted || (loading && page === 1) ? (
         <div className="grid w-full md:gap-8 gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: infiniteScroll ? initialLimit : 4 }).map(
             (_, i) => (
