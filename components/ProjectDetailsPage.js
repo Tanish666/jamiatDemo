@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useRef, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
 import useSWR from "swr";
 import {
   MapPin,
@@ -38,6 +39,7 @@ const fetcher = (url) => fetch(url).then((res) => res.json());
 
 export default function ProjectDetailsPage({ slug, projectId }) {
   const { isSignedIn } = useUser();
+  const pathname = usePathname();
   const [activeTab, setActiveTab] = useState("impact");
   const [checkedDonationType, setCheckedDonationType] = useState();
   const [amount, setAmount] = useState("");
@@ -695,7 +697,7 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                   {/* Proceed Button */}
                   <Link
                     href={{
-                      pathname: !isSignedIn ? "/login" : `/donate/${slug}`,
+                      pathname: !isSignedIn ? `/login?redirect_url=${encodeURIComponent(pathname)}` : `/donate/${slug}`,
                       query: {
                         type: checkedDonationType || checkedCategory,
                         amount,

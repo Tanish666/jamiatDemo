@@ -4,24 +4,29 @@ import { SignUp } from "@clerk/nextjs";
 import { Playfair_Display } from "next/font/google";
 import { MoveLeft, ShieldCheck, Heart, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
   weight: ["400", "700"],
 });
 
-export default function SignUpPage() {
+function SignUpContent() {
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect_url") || "/";
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center pt-24 pb-12 px-4 relative overflow-hidden font-sans">
+    <div className="min-h-[100dvh] bg-[#F8FAFC] flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans">
       {/* Dynamic Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
         <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-emerald-100/40 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-teal-50/50 rounded-full blur-[120px]" />
       </div>
 
-      <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 r relative z-10">
-        {/* Visual Content Side */}
-        <div className="hidden lg:flex flex-col space-y-10 pr-12">
+      <div className="w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-center gap-12 relative z-10">
+        {/* Visual Content Side - Desktop Only */}
+        <div className="hidden lg:flex flex-col space-y-10 lg:w-1/2 pr-12">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-emerald-700 font-bold hover:text-emerald-800 transition-all group w-fit"
@@ -46,14 +51,14 @@ export default function SignUpPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="bg-white/60 backdrop-blur-sm p-6 rounded-[24px] border border-emerald-50 flex items-start gap-4 hover:shadow-xl hover:bg-white transition-all duration-300">
               <div className="p-3 bg-emerald-100 rounded-xl text-emerald-700">
                 <ShieldCheck className="w-6 h-6" />
               </div>
               <div>
                 <h4 className="font-bold text-[#1a2e35]">Secure & Private</h4>
-                <p className="text-sm text-gray-500 mt-1">Your data is encrypted and handled with care.</p>
+                <p className="text-sm text-gray-500 mt-1">Data is encrypted.</p>
               </div>
             </div>
             <div className="bg-white/60 backdrop-blur-sm p-6 rounded-[24px] border border-emerald-50 flex items-start gap-4 hover:shadow-xl hover:bg-white transition-all duration-300">
@@ -62,55 +67,51 @@ export default function SignUpPage() {
               </div>
               <div>
                 <h4 className="font-bold text-[#1a2e35]">Impact Reports</h4>
-                <p className="text-sm text-gray-500 mt-1">Get detailed insights on where your charity goes.</p>
+                <p className="text-sm text-gray-500 mt-1">Detailed insights.</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Auth Form Side */}
-        <div className="flex justify-center items-center">
-          <div className="relative w-full max-w-md">
-            <div >
-              <SignUp
-                appearance={{
-                  elements: {
-                    rootBox: "w-full",
-                    card: "w-full shadow-none border-none p-10 sm:p-12 bg-transparent",
-                    headerTitle: `${playfair.className} text-4xl font-bold text-[#1a2e35] mb-2`,
-                    headerSubtitle: "text-gray-400 font-medium text-base tracking-tight",
-                    formButtonPrimary:
-                      "bg-[#064e3b] hover:bg-[#065f46] text-sm font-bold py-4 rounded-2xl transition-all shadow-lg shadow-emerald-900/10 active:scale-[0.98] uppercase tracking-widest",
-                    socialButtonsBlockButton: "border-gray-100 hover:bg-gray-50/80 transition-all rounded-2xl py-3.5 border-2 shadow-sm",
-                    socialButtonsBlockButtonText: "font-bold text-gray-700 text-sm",
-                    formFieldLabel: "text-[#1a2e35] font-bold text-[11px] uppercase tracking-[0.15em] mb-2.5 ml-1",
-                    formFieldInput: "bg-gray-50/80 border-gray-100 focus:border-emerald-500/50 focus:bg-white rounded-2xl py-3.5 px-5 transition-all outline-none border-2",
-                    footerActionLink: "text-emerald-600 hover:text-emerald-700 font-bold transition-colors",
-                    dividerText: "text-gray-300 text-[10px] font-bold uppercase tracking-[0.3em]",
-                    identityPreviewText: "text-[#1a2e35] font-bold",
-                    identityPreviewEditButton: "text-emerald-600 font-bold",
-                  }
-                }}
-              />
-            </div>
-
-            {/* Bottom Trust/Policy Text */}
-            <div className="mt-10 space-y-4">
-              <p className="text-center text-xs text-gray-400 font-medium leading-relaxed max-w-[280px] mx-auto">
-                By joining Jamiat, you agree to our{" "}
-                <Link href="/terms" className="text-emerald-600 hover:text-emerald-700 font-bold underline underline-offset-4 decoration-emerald-200">Terms of Service</Link> and{" "}
-                <Link href="/policy" className="text-emerald-600 hover:text-emerald-700 font-bold underline underline-offset-4 decoration-emerald-200">Privacy Policy</Link>.
-              </p>
-
-              <div className="flex justify-center items-center gap-6 opacity-40 grayscale group-hover:grayscale-0 transition-all">
-                <ShieldCheck className="w-5 h-5 text-gray-400" />
-                <div className="h-4 w-[1px] bg-gray-200" />
-                <Sparkles className="w-5 h-5 text-gray-400" />
-              </div>
-            </div>
+        <div className="w-full lg:w-1/2 flex justify-center items-center">
+          <div className="w-full max-w-md flex justify-center">
+            <SignUp
+              appearance={{
+                elements: {
+                  rootBox: "w-full flex justify-center mx-0",
+                  card: "w-full shadow-none border-none p-6 sm:p-12 bg-transparent mx-auto",
+                  headerTitle: `${playfair.className} text-4xl font-bold text-[#1a2e35] mb-2`,
+                  headerSubtitle: "text-gray-400 font-medium text-base tracking-tight",
+                  formButtonPrimary:
+                    "bg-[#064e3b] hover:bg-[#065f46] text-sm font-bold py-4 rounded-2xl transition-all shadow-lg shadow-emerald-900/10 active:scale-[0.98] uppercase tracking-widest",
+                  socialButtonsBlockButton: "border-gray-100 hover:bg-gray-50/80 transition-all rounded-2xl py-3.5 border-2 shadow-sm",
+                  socialButtonsBlockButtonText: "font-bold text-gray-700 text-sm",
+                  formFieldLabel: "text-[#1a2e35] font-bold text-[11px] uppercase tracking-[0.15em] mb-2.5 ml-1",
+                  formFieldInput: "bg-gray-50/80 border-gray-100 focus:border-emerald-500/50 focus:bg-white rounded-2xl py-3.5 px-5 transition-all outline-none border-2",
+                  footerActionLink: "text-emerald-600 hover:text-emerald-700 font-bold transition-colors",
+                  dividerText: "text-gray-300 text-[10px) font-bold uppercase tracking-[0.3em]",
+                  identityPreviewText: "text-[#1a2e35] font-bold",
+                  identityPreviewEditButton: "text-emerald-600 font-bold",
+                }
+              }}
+              fallbackRedirectUrl={redirectUrl}
+            />
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+      </div>
+    }>
+      <SignUpContent />
+    </Suspense>
+  );
+}

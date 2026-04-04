@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useScroll, useMotionValueEvent } from "framer-motion";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { Users, Calendar, Search } from "lucide-react";
 import Image from "next/image";
@@ -64,6 +65,7 @@ export default function ProjectCardsSection({
   initialLimit = 4, // how many to load per API call
 }) {
   const [projects, setProjects] = useState([]);
+  const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -336,7 +338,7 @@ export default function ProjectCardsSection({
                     <div className="flex flex-col sm:flex-row gap-1.5 mt-auto">
                       {project?.status !== "Completed" && (
                         <Link
-                          href={!isSignedIn ? "/login" : `/donate/${project?.slug || ""}`}
+                          href={!isSignedIn ? `/login?redirect_url=${encodeURIComponent(pathname)}` : `/donate/${project?.slug || ""}`}
                           className="w-full sm:flex-1 text-center bg-[#06422d] text-white py-[0.70rem] px-1 rounded-xl hover:bg-emerald-800 text-sm font-bold transition-all duration-300 active:scale-[0.98] shadow-lg shadow-emerald-900/10 whitespace-nowrap"
                         >
                           Donate Now

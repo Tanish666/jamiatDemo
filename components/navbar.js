@@ -100,13 +100,13 @@ export default function Headers() {
           <div className="hidden xl:flex items-center gap-4">
             <SignedOut>
               <Link
-                href="/login"
+                href={`/login?redirect_url=${encodeURIComponent(pathname)}`}
                 className="px-5 py-2.5 text-sm font-bold text-emerald-100 hover:text-white transition-colors"
               >
                 Login
               </Link>
               <Link
-                href="/signup"
+                href={`/signup?redirect_url=${encodeURIComponent(pathname)}`}
                 className={`${playfair.className} px-6 py-2.5 bg-emerald-500 text-white text-sm font-bold rounded-xl shadow-md shadow-emerald-900/20 hover:bg-emerald-400 transition-all active:scale-[0.98]`}
               >
                 Sign Up
@@ -164,14 +164,14 @@ export default function Headers() {
               <SignedOut>
                 <div className="flex flex-col gap-3">
                   <Link
-                    href="/login"
+                    href={`/login?redirect_url=${encodeURIComponent(pathname)}`}
                     className="w-full py-3 text-center text-emerald-100 font-bold hover:text-white"
                     onClick={() => setIsOpen(false)}
                   >
                     Login
                   </Link>
                   <Link
-                    href="/signup"
+                    href={`/signup?redirect_url=${encodeURIComponent(pathname)}`}
                     className="w-full py-3 text-center bg-emerald-500 text-white font-bold rounded-xl shadow-lg border border-emerald-400/20"
                     onClick={() => setIsOpen(false)}
                   >
