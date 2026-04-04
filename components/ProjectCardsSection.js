@@ -348,7 +348,7 @@ export default function ProjectCardsSection({
                             ? "/login"
                             : `/donate/${project?.slug || ""}`
                         }
-                        className="w-full sm:flex-1 text-center bg-[#06422d] text-white py-2 px-1 rounded-xl hover:bg-emerald-800 text-sm font-bold transition-all duration-300 active:scale-[0.98] shadow-lg shadow-emerald-900/10 whitespace-nowrap"
+                        className="w-full sm:flex-1 text-center bg-[#06422d] text-white py-[0.55rem] px-1 rounded-xl hover:bg-emerald-800 text-sm font-bold transition-all duration-300 active:scale-[0.98] shadow-lg shadow-emerald-900/10 whitespace-nowrap"
                       >
                         Donate Now
                       </Link>
