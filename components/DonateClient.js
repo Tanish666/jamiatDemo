@@ -81,7 +81,7 @@ export default function DonatePage({ searchParams }) {
   // Show fixed mobile progress bar only when page is scrolled past 20%
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     console.log(latest);
-    if (latest > 0.5218372329601254) setIsDonationVisible(true)
+    if (latest > 0.4) setIsDonationVisible(true)
     else setIsDonationVisible(false)
   });
 
